@@ -120,41 +120,23 @@ fun RegisterScreen(registerViewModel: RegisterViewModel) {
                 }
 
             }
-            TextField(
+            CustomTextField(
                 value = name,
                 onValueChange = { name = it },
-                label = { Text(text = "Name", color = BluePrimary) },
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    focusedBorderColor = MaterialTheme.colors.primary,
-                    unfocusedBorderColor = MaterialTheme.colors.primary),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 12.dp),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+                label = "Name",
+                keyboardType = KeyboardType.Text
             )
-            TextField(
+            CustomTextField(
                 value = address,
                 onValueChange = { address = it },
-                label = { Text(text = "Address", color = BluePrimary) },
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    focusedBorderColor = MaterialTheme.colors.primary,
-                    unfocusedBorderColor = MaterialTheme.colors.primary),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 12.dp),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+                label = "Address",
+                keyboardType = KeyboardType.Text
             )
-            TextField(
+            CustomTextField(
                 value = email,
                 onValueChange = { email = it },
-                label = { Text(text = "Email", color = BluePrimary) },
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    focusedBorderColor = MaterialTheme.colors.primary,
-                    unfocusedBorderColor = MaterialTheme.colors.primary),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 12.dp),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
+                label = "Email",
+                keyboardType = KeyboardType.Email
             )
             TextField(
                 value = password,
