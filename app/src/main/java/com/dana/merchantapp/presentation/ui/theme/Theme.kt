@@ -1,4 +1,4 @@
-package com.dana.merchantapp.ui.theme
+package com.dana.merchantapp.presentation.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.MaterialTheme
@@ -13,7 +13,7 @@ private val DarkColorPalette = darkColors(
 )
 
 private val LightColorPalette = lightColors(
-    primary = Purple500,
+    primary = BluePrimary,
     primaryVariant = Purple700,
     secondary = Teal200
 

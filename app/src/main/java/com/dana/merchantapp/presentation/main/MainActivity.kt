@@ -1,4 +1,4 @@
-package com.dana.merchantapp
+package com.dana.merchantapp.presentation.main
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -10,7 +10,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.dana.merchantapp.ui.theme.MerchantAppTheme
+import com.dana.merchantapp.presentation.ui.theme.MerchantAppTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -1,4 +1,4 @@
-package com.dana.merchantapp.ui.theme
+package com.dana.merchantapp.presentation.ui.theme
 
 import androidx.compose.material.Typography
 import androidx.compose.ui.text.TextStyle
