@@ -20,6 +20,7 @@ class RegisterRepositoryImpl : RegisterRepository {
                         "balance" to 0,
                         "email" to email,
                         "merchantAddress" to address,
+                        "merchantLogo" to "https://media.discordapp.net/attachments/1105099627042193490/1109750540268744704/image.png?width=640&height=640",
                         "merchantName" to name
                     )
 

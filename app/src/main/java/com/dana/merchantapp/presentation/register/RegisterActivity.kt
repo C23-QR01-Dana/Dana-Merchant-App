@@ -1,20 +1,12 @@
 package com.dana.merchantapp.presentation.register
 
-import android.app.Activity
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
@@ -22,9 +14,7 @@ import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -38,7 +28,7 @@ import com.dana.merchantapp.domain.register.RegisterUseCase
 import com.dana.merchantapp.presentation.ui.component.CustomTextField
 import com.dana.merchantapp.presentation.ui.theme.BluePrimary
 import com.dana.merchantapp.presentation.ui.theme.MerchantAppTheme
-import java.io.File
+
 
 
 class RegisterActivity : ComponentActivity() {
@@ -89,37 +79,15 @@ fun RegisterScreen(registerViewModel: RegisterViewModel) {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
-            Box(
+            Image(
+                painter = painterResource(R.drawable.logo_dana),
+                contentDescription = "Logo Dana",
+                contentScale = ContentScale.Crop,
                 modifier = Modifier
-                    .size(120.dp)
+                    .size(172.dp)
+                    .padding(12.dp)
+            )
 
-            ) {
-                Image(
-                    painter = painterResource(R.drawable.avtr),
-                    contentDescription = "Profile Image",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize().clip(CircleShape)
-                )
-                Box(
-                    modifier = Modifier
-                        .size(48.dp)
-                        .align(Alignment.BottomEnd)
-                        .padding(8.dp)
-                        .clip(CircleShape)
-                        .background(BluePrimary),
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.baseline_edit_24),
-                        contentDescription = "Camera Icon",
-                        tint = Color.White,
-                        modifier = Modifier
-                            .align(Alignment.Center)
-                            .size(16.dp)
-                    )
-                }
-
-            }
             CustomTextField(
                 value = name,
                 onValueChange = { name = it },
