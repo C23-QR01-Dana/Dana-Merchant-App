@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -39,7 +40,7 @@ class RegisterActivity : ComponentActivity() {
 
         val registerRepository = RegisterRepositoryImpl()
         val registerUseCase = RegisterUseCase(registerRepository)
-        registerViewModel = RegisterViewModel(registerUseCase)
+        registerViewModel = RegisterViewModel(this,registerUseCase)
         setContent {
             MerchantAppTheme {
                 Surface(
@@ -149,9 +150,10 @@ fun RegisterScreen(registerViewModel: RegisterViewModel) {
 @Preview(showBackground = true)
 @Composable
 fun RegisterScreenPreview() {
+    val context = LocalContext.current
     val registerRepository = RegisterRepositoryImpl()
     val registerUseCase = RegisterUseCase(registerRepository)
-    val registerViewModel = RegisterViewModel(registerUseCase)
+    val registerViewModel = RegisterViewModel(context,registerUseCase)
 
 
     MerchantAppTheme {
