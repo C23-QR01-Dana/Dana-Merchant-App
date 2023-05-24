@@ -138,6 +138,7 @@ fun RegisterScreen(registerViewModel: RegisterViewModel) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 16.dp)
+                    .shadow(8.dp, shape = RoundedCornerShape(20.dp))
             ) {
                 Text(text = "Register")
             }
