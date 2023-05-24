@@ -9,7 +9,7 @@ class RegisterRepositoryImpl : RegisterRepository {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
 
-    override fun registerUser(name: String, address: String,email: String, password: String) {
+    override fun registerUser(name: String, address: String,email: String, password: String, callback: (Boolean, String) -> Unit) {
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
@@ -29,16 +29,20 @@ class RegisterRepositoryImpl : RegisterRepository {
                             .set(merchantData)
                             .addOnSuccessListener {
                                 Log.v("register", "Data successfully saved to Firestore")
+                                callback(true, "Registration Success")
                             }
                             .addOnFailureListener { e ->
                                 Log.e("register", "Error saving data to Firestore", e)
+                                callback(false, "Registration error")
                             }
                     } else {
                         Log.e("register", "User UID is null")
+                        callback(false, "Registration error")
                     }
                 } else {
                     val errorMsg = task.exception?.message ?: "Registration failed"
                     Log.e("register", errorMsg)
+                    callback(false, errorMsg)
                 }
             }
     }
