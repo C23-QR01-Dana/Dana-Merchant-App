@@ -30,6 +30,11 @@
             android:label="@string/title_activity_register"
             android:theme="@style/Theme.MerchantApp"/>
         <activity
+            android:name=".presentation.login.LoginActivity"
+            android:exported="false"
+            android:label="@string/title_activity_login"
+            android:theme="@style/Theme.MerchantApp"/>
+        <activity
             android:name=".presentation.main.MainActivity"
             android:exported="false" />
     </application>

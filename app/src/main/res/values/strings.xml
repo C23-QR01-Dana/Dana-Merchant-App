@@ -3,4 +3,5 @@
     <string name="title_activity_main">MainActivity</string>
     <string name="title_activity_register">RegisterActivity</string>
     <string name="title_activity_landing">LandingActivity</string>
+    <string name="title_activity_login">LoginActivity</string>
 </resources>
