@@ -1,4 +1,4 @@
-package com.dana.merchantapp.presentation.ui.component
+package com.dana.merchantapp.presentation.ui.component.navigation
 
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -10,12 +10,16 @@ import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import com.dana.merchantapp.presentation.model.BottomNavItem
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
 
 @Composable
 fun CustomBottomNavigation(
+    navController: NavHostController
 ) {
     BottomAppBar(
         cutoutShape = CircleShape,
@@ -23,24 +27,34 @@ fun CustomBottomNavigation(
         modifier = Modifier.fillMaxWidth()
     ) {
         BottomNavigation(
-            backgroundColor = MaterialTheme.colors.background,
+            backgroundColor = Color.White,
             contentColor = MaterialTheme.colors.primary
         ) {
+            val navBackStackEntry by navController.currentBackStackEntryAsState()
+            val currentRoute = navBackStackEntry?.destination?.route
 
             val items = listOf(
-                BottomNavItem("Home", Icons.Default.Home, "home"),
-                BottomNavItem("History", Icons.Default.History, "history"),
-                BottomNavItem("Bank", Icons.Default.CreditCard, "withdrawal"),
-                BottomNavItem("Profile", Icons.Default.Person, "profile")
+                BottomNavItem("Home", Icons.Default.Home, Screen.Home),
+                BottomNavItem("History", Icons.Default.History, Screen.History),
+                BottomNavItem("Bank", Icons.Default.CreditCard, Screen.Withdrawal),
+                BottomNavItem("Profile", Icons.Default.Person, Screen.Profile)
             )
 
             items.forEachIndexed { index, item ->
                 BottomNavigationItem(
                     icon = { Icon(item.icon, contentDescription = item.title) },
                     label = { Text(item.title) },
-                    selected = "" == item.route,
+                    selected = currentRoute == item.screen.route,
                     unselectedContentColor = Color.Black,
-                    onClick = {}
+                    onClick = {
+                        navController.navigate(item.screen.route) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            restoreState = true
+                            launchSingleTop = true
+                        }
+                    }
                 )
 
 

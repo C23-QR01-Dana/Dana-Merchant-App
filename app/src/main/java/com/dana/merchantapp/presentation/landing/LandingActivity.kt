@@ -23,14 +23,20 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.dana.merchantapp.R
+import com.dana.merchantapp.presentation.login.LoginActivity
+import com.dana.merchantapp.presentation.main.MainActivity
 import com.dana.merchantapp.presentation.register.RegisterActivity
 import com.dana.merchantapp.presentation.ui.theme.BluePrimary
 import com.dana.merchantapp.presentation.ui.theme.MerchantAppTheme
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 
 class LandingActivity : ComponentActivity() {
-
+    private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        auth = Firebase.auth
         super.onCreate(savedInstanceState)
 
         setContent {
@@ -42,6 +48,16 @@ class LandingActivity : ComponentActivity() {
                     LandingScreen(this)
                 }
             }
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        val currentUser = auth.currentUser
+        if (currentUser != null) {
+            val intent = Intent(this, MainActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+            startActivity(intent)
         }
     }
 }
@@ -77,7 +93,8 @@ fun LandingScreen(context: Context) {
             )
             Button(
                 onClick = {
-
+                    val intent = Intent(context, LoginActivity::class.java)
+                    context.startActivity(intent)
                 },
                 shape = RoundedCornerShape(20.dp),
 
