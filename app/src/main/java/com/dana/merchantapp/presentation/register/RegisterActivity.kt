@@ -1,6 +1,8 @@
 package com.dana.merchantapp.presentation.register
 
+import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.*
@@ -26,12 +28,14 @@ import androidx.compose.ui.unit.dp
 import com.dana.merchantapp.R
 import com.dana.merchantapp.data.register.RegisterRepositoryImpl
 import com.dana.merchantapp.domain.register.RegisterUseCase
+import com.dana.merchantapp.presentation.main.MainActivity
 import com.dana.merchantapp.presentation.ui.component.CustomTextField
 import com.dana.merchantapp.presentation.ui.theme.BluePrimary
 import com.dana.merchantapp.presentation.ui.theme.MerchantAppTheme
+import dagger.hilt.android.AndroidEntryPoint
 
 
-
+@AndroidEntryPoint
 class RegisterActivity : ComponentActivity() {
     private lateinit var registerViewModel: RegisterViewModel
 
@@ -40,7 +44,20 @@ class RegisterActivity : ComponentActivity() {
 
         val registerRepository = RegisterRepositoryImpl()
         val registerUseCase = RegisterUseCase(registerRepository)
-        registerViewModel = RegisterViewModel(this,registerUseCase)
+        registerViewModel = RegisterViewModel(registerUseCase)
+
+        registerViewModel.registerResult.observe(this) { isSuccess ->
+            if (isSuccess) {
+                val intent = Intent(this, MainActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+                startActivity(intent)
+            }
+        }
+
+        registerViewModel.registerMessage.observe(this) { message ->
+            Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+        }
+
         setContent {
             MerchantAppTheme {
                 Surface(
@@ -151,10 +168,9 @@ fun RegisterScreen(registerViewModel: RegisterViewModel) {
 @Preview(showBackground = true)
 @Composable
 fun RegisterScreenPreview() {
-    val context = LocalContext.current
     val registerRepository = RegisterRepositoryImpl()
     val registerUseCase = RegisterUseCase(registerRepository)
-    val registerViewModel = RegisterViewModel(context,registerUseCase)
+    val registerViewModel = RegisterViewModel(registerUseCase)
 
 
     MerchantAppTheme {
