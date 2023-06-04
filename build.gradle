@@ -1,7 +1,6 @@
 buildscript {
     ext {
         compose_ui_version = '1.4.0'
-        hilt_version = '2.44'
     }
     dependencies {
         classpath 'com.google.gms:google-services:4.3.15'

@@ -6,7 +6,7 @@ import androidmads.library.qrgenearator.QRGEncoder
 import com.dana.merchantapp.presentation.model.Merchant
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.tasks.await
+
 
 class QRRepositoryImpl: QRRepository {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
@@ -18,6 +18,28 @@ class QRRepositoryImpl: QRRepository {
         qrgEncoder.setColorBlack(0xFFFFFFFF.toInt())
         qrgEncoder.setColorWhite(0xFF000000.toInt())
         return qrgEncoder.bitmap
+    }
+
+    override fun getMerchant(callback: (Merchant?) -> Unit) {
+        val merchantId = auth.currentUser?.uid
+        if (merchantId != null) {
+            val merchantDocRef = firestore.collection("merchant").document(merchantId)
+            merchantDocRef.get()
+                .addOnSuccessListener { documentSnapshot ->
+                    if (documentSnapshot.exists()) {
+                        val merchant = MerchantMapper.mapToMerchant(documentSnapshot)
+                        callback(merchant)
+                    } else {
+                        callback(null)
+                    }
+                }
+                .addOnFailureListener { exception ->
+                    // Handle the failure case
+                    callback(null)
+                }
+        } else {
+            callback(null)
+        }
     }
 
 }

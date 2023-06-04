@@ -35,7 +35,9 @@ import com.dana.merchantapp.presentation.ui.component.navigation.CustomBottomNav
 import com.dana.merchantapp.presentation.ui.component.navigation.Screen
 import com.dana.merchantapp.presentation.ui.theme.BlueButton
 import com.dana.merchantapp.presentation.ui.theme.MerchantAppTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private lateinit var mainViewModel: MainViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
