@@ -6,23 +6,38 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.QrCode
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import com.dana.merchantapp.data.main.MainRepositoryImpl
 import com.dana.merchantapp.domain.main.MainUseCase
+import com.dana.merchantapp.presentation.screen.*
 import com.dana.merchantapp.presentation.landing.LandingActivity
+import com.dana.merchantapp.presentation.screen.history.HistoryScreen
+import com.dana.merchantapp.presentation.screen.home.HomeScreen
+import com.dana.merchantapp.presentation.screen.profile.ProfileScreen
+import com.dana.merchantapp.presentation.screen.qr.QrScreen
+import com.dana.merchantapp.presentation.screen.withdrawal.WithdrawalScreen
+import com.dana.merchantapp.presentation.ui.component.navigation.BottomNavItem
+import com.dana.merchantapp.presentation.ui.component.navigation.CustomBottomNavigation
+import com.dana.merchantapp.presentation.ui.component.navigation.Screen
+import com.dana.merchantapp.presentation.ui.theme.BlueButton
 import com.dana.merchantapp.presentation.ui.theme.MerchantAppTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private lateinit var mainViewModel: MainViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,20 +76,65 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Main(mainViewModel: MainViewModel) {
-    Button(
-        onClick = {
-            mainViewModel.logoutUser()
-        },
-        shape = RoundedCornerShape(20.dp),
+fun Main(mainViewModel: MainViewModel,navController: NavHostController = rememberNavController()) {
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
 
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 16.dp)
-            .shadow(8.dp, shape = RoundedCornerShape(20.dp))
-    ) {
-        Text(text = "Logout")
+    Scaffold(
+        bottomBar = {
+            if (currentRoute != Screen.QR.route) {
+                CustomBottomNavigation(navController)
+            }
+        },
+        floatingActionButton = {
+            if (currentRoute != Screen.QR.route) {
+                FloatingActionButton(
+                    onClick = {
+                        val item = BottomNavItem("QR", Icons.Default.QrCode, Screen.QR)
+                        navController.navigate(item.screen.route) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            restoreState = true
+                            launchSingleTop = true
+                        }
+                    },
+                    backgroundColor = BlueButton
+
+                ) {
+                    Icon(Icons.Default.QrCode, contentDescription = "QR", tint = Color.White)
+                }
+            }
+
+        },
+        isFloatingActionButtonDocked = true,
+        floatingActionButtonPosition = FabPosition.Center,
+    ) { innerPadding ->
+        NavHost(
+            navController = navController,
+            startDestination = Screen.Home.route,
+            modifier = Modifier.padding(innerPadding)
+        ) {
+            composable(Screen.Home.route) {
+                HomeScreen(mainViewModel)
+            }
+            composable(Screen.QR.route) {
+                QrScreen()
+            }
+            composable(Screen.Withdrawal.route) {
+                WithdrawalScreen()
+            }
+            composable(Screen.History.route) {
+                HistoryScreen()
+            }
+
+            composable(Screen.Profile.route) {
+                ProfileScreen()
+            }
+        }
+        // Content area
     }
+
 }
 
 @Preview(showBackground = true)
