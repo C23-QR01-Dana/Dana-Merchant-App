@@ -19,15 +19,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.dana.merchantapp.R
-import com.dana.merchantapp.data.register.RegisterRepositoryImpl
-import com.dana.merchantapp.domain.register.RegisterUseCase
+
 import com.dana.merchantapp.presentation.main.MainActivity
 import com.dana.merchantapp.presentation.ui.component.CustomTextField
 import com.dana.merchantapp.presentation.ui.theme.BluePrimary
@@ -37,26 +38,10 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class RegisterActivity : ComponentActivity() {
-    private lateinit var registerViewModel: RegisterViewModel
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        val registerRepository = RegisterRepositoryImpl()
-        val registerUseCase = RegisterUseCase(registerRepository)
-        registerViewModel = RegisterViewModel(registerUseCase)
-
-        registerViewModel.registerResult.observe(this) { isSuccess ->
-            if (isSuccess) {
-                val intent = Intent(this, MainActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
-                startActivity(intent)
-            }
-        }
-
-        registerViewModel.registerMessage.observe(this) { message ->
-            Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-        }
 
         setContent {
             MerchantAppTheme {
@@ -64,7 +49,7 @@ class RegisterActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    RegisterScreen(registerViewModel)
+                    RegisterScreen()
                 }
             }
         }
@@ -73,13 +58,30 @@ class RegisterActivity : ComponentActivity() {
 
 
 @Composable
-fun RegisterScreen(registerViewModel: RegisterViewModel) {
+fun RegisterScreen(registerViewModel: RegisterViewModel = hiltViewModel()) {
+    val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    registerViewModel.registerResult.observe(lifecycleOwner) { isSuccess ->
+        if (isSuccess) {
+            val intent = Intent(context, MainActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+            context.startActivity(intent)
+        }
+    }
+
+    registerViewModel.registerMessage.observe(lifecycleOwner) { message ->
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+    }
+
+
     var name by remember { mutableStateOf("") }
     var address by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordHidden by remember { mutableStateOf(true) }
     val scrollState = rememberScrollState()
+
 
 
     Card (
@@ -168,12 +170,10 @@ fun RegisterScreen(registerViewModel: RegisterViewModel) {
 @Preview(showBackground = true)
 @Composable
 fun RegisterScreenPreview() {
-    val registerRepository = RegisterRepositoryImpl()
-    val registerUseCase = RegisterUseCase(registerRepository)
-    val registerViewModel = RegisterViewModel(registerUseCase)
+
 
 
     MerchantAppTheme {
-        RegisterScreen(registerViewModel)
+        RegisterScreen()
     }
 }

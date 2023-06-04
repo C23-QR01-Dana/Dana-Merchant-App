@@ -21,7 +21,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.dana.merchantapp.data.qr.QRRepositoryImpl
 import com.dana.merchantapp.domain.qr.QRUseCase
-import com.dana.merchantapp.presentation.QRActivity
+
 import com.dana.merchantapp.presentation.screen.qr.staticqr.StaticQrScreen
 import com.dana.merchantapp.presentation.ui.component.CustomTabLayout
 import com.dana.merchantapp.presentation.ui.component.CustomTextField
