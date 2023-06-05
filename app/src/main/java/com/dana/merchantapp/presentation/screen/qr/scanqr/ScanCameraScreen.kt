@@ -32,85 +32,73 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun ScanCameraScreen(navController: NavController, harga: Int) {
-    Log.v("harga", "${harga}")
-    Button(
-        onClick = {
-            navController.navigate(Screen.ScanResult.createRoute("${harga}","ser1"))
-        },
-        shape = RoundedCornerShape(20.dp),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp)
 
-    ) {
-        Text(text = "Generate QR")
+    val context = LocalContext.current
+    val scannerView = remember { CodeScannerView(context) }
+    val codeScanner = remember { CodeScanner(context, scannerView) }.apply {
+        isAutoFocusEnabled = true
+        scanMode = ScanMode.SINGLE
+        decodeCallback = DecodeCallback { result ->
+            // Callback when QR code is successfully scanned
+            // Implement your UI changes here
+        }
+        errorCallback = ErrorCallback {
+            // Callback when an error occurs while scanning QR code
+            // Implement your UI changes here
+        }
     }
-//    val context = LocalContext.current
-//    val scannerView = remember { CodeScannerView(context) }
-//    val codeScanner = remember { CodeScanner(context, scannerView) }.apply {
-//        isAutoFocusEnabled = true
-//        scanMode = ScanMode.SINGLE
-//        decodeCallback = DecodeCallback { result ->
-//            // Callback when QR code is successfully scanned
-//            // Implement your UI changes here
-//        }
-//        errorCallback = ErrorCallback {
-//            // Callback when an error occurs while scanning QR code
-//            // Implement your UI changes here
-//        }
-//    }
-//
-//    // Inisialisasi scanner saat komponen dijalankan
-//    LaunchedEffect(Unit) {
-//        codeScanner.startPreview()
-//    }
-//
-//    // Callback saat QR code berhasil terdekripsi
-//    codeScanner.setDecodeCallback { result ->
-//        // Melakukan aksi yang berhubungan dengan UI di thread utama
-//        CoroutineScope(Dispatchers.Main).launch {
-//            val qrData = result.text.split("#")
-//            val isValid = qrData.size == 3 && qrData[0] == "DANA" && qrData[1] == "CPM"
-//            if (isValid) {
-//                Toast.makeText(context, "QR valid", Toast.LENGTH_SHORT).show()
-//                navController.navigate(Screen.ScanResult.createRoute("${harga}",qrData[2]))
-//            } else {
-//                Toast.makeText(context, "QR tidak valid", Toast.LENGTH_SHORT).show()
-//            }
-//        }
-//    }
-//
-//    val permissionLauncher = rememberLauncherForActivityResult(
-//        contract = ActivityResultContracts.RequestPermission()
-//    ) { isGranted ->
-//        if (isGranted) {
-//            // Izin kamera diberikan, mulai preview scanner
-//            codeScanner.startPreview()
-//        } else {
-//            // Izin kamera tidak diberikan, lakukan penanganan yang sesuai (misalnya menampilkan pesan kesalahan)
-//            Toast.makeText(context, "Izin kamera tidak diberikan", Toast.LENGTH_SHORT).show()
-//        }
-//    }
-//
-//    LaunchedEffect(Unit) {
-//        // Memeriksa izin kamera saat komponen dijalankan
-//        val isCameraPermissionGranted = ContextCompat.checkSelfPermission(
-//            context,
-//            Manifest.permission.CAMERA
-//        ) == PackageManager.PERMISSION_GRANTED
-//
-//        if (!isCameraPermissionGranted) {
-//            // Jika izin kamera belum diberikan, minta izin
-//            permissionLauncher.launch(Manifest.permission.CAMERA)
-//        } else {
-//            // Jika izin kamera telah diberikan, mulai preview scanner
-//            codeScanner.startPreview()
-//        }
-//    }
-//
-//    AndroidView(
-//        modifier = Modifier.fillMaxSize(),
-//        factory = { scannerView }
-//    )
+
+    // Inisialisasi scanner saat komponen dijalankan
+    LaunchedEffect(Unit) {
+        codeScanner.startPreview()
+    }
+
+    // Callback saat QR code berhasil terdekripsi
+    codeScanner.setDecodeCallback { result ->
+        // Melakukan aksi yang berhubungan dengan UI di thread utama
+        CoroutineScope(Dispatchers.Main).launch {
+            val qrData = result.text.split("#")
+            val isValid = qrData.size == 3 && qrData[0] == "DANA" && qrData[1] == "CPM"
+            if (isValid) {
+                Toast.makeText(context, "QR valid", Toast.LENGTH_SHORT).show()
+                navController.navigate(Screen.ScanResult.createRoute("${harga}",qrData[2]))
+            } else {
+                Toast.makeText(context, "QR tidak valid", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            // Izin kamera diberikan, mulai preview scanner
+            codeScanner.startPreview()
+        } else {
+            // Izin kamera tidak diberikan, lakukan penanganan yang sesuai (misalnya menampilkan pesan kesalahan)
+            Toast.makeText(context, "Izin kamera tidak diberikan", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        // Memeriksa izin kamera saat komponen dijalankan
+        val isCameraPermissionGranted = ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.CAMERA
+        ) == PackageManager.PERMISSION_GRANTED
+
+        if (!isCameraPermissionGranted) {
+            // Jika izin kamera belum diberikan, minta izin
+            permissionLauncher.launch(Manifest.permission.CAMERA)
+        } else {
+            // Jika izin kamera telah diberikan, mulai preview scanner
+            codeScanner.startPreview()
+        }
+    }
+
+    AndroidView(
+        modifier = Modifier.fillMaxSize(),
+        factory = { scannerView }
+    )
 }
 
