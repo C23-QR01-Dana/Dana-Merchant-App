@@ -20,6 +20,15 @@ class QRRepositoryImpl: QRRepository {
         return qrgEncoder.bitmap
     }
 
+    override fun generateDynamicQR(amount: String): Bitmap {
+        val content = "DANA#MPM#" + auth.currentUser?.uid + "#" + amount
+        val qrgEncoder = QRGEncoder(content, null, QRGContents.Type.TEXT, 500)
+        qrgEncoder.setColorBlack(0xFFFFFFFF.toInt())
+        qrgEncoder.setColorWhite(0xFF000000.toInt())
+        return qrgEncoder.bitmap
+    }
+
+
     override fun getMerchant(callback: (Merchant?) -> Unit) {
         val merchantId = auth.currentUser?.uid
         if (merchantId != null) {

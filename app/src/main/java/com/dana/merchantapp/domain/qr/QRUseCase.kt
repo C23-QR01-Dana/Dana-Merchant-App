@@ -10,6 +10,11 @@ class QRUseCase  @Inject constructor (private val qrRepository: QRRepository) {
     fun generateStaticQR() : Bitmap {
         return qrRepository.generateStaticQR()
     }
+
+    fun generateDynamicQR(amount: String) : Bitmap {
+        return qrRepository.generateDynamicQR(amount)
+    }
+
     fun getMerchant(callback: (Merchant?) -> Unit){
         qrRepository.getMerchant  { merchant ->
             callback(merchant)
