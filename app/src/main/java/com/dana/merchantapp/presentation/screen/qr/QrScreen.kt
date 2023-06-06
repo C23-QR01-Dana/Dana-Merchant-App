@@ -21,6 +21,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.dana.merchantapp.data.qr.QRRepositoryImpl
 import com.dana.merchantapp.domain.qr.QRUseCase
+import com.dana.merchantapp.presentation.screen.qr.dynamicqr.DynamicQrScreen
 
 import com.dana.merchantapp.presentation.screen.qr.staticqr.StaticQrScreen
 import com.dana.merchantapp.presentation.ui.component.CustomTabLayout
@@ -47,47 +48,6 @@ fun QrScreen() {
             1 -> ScanQrScreen()
             2 -> DynamicQrScreen()
         }
-    }
-}
-
-@Composable
-fun DynamicQrScreen() {
-//    Text("Dynamic QR")
-    var harga by remember { mutableStateOf("") }
-
-    Card (
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-            .shadow(8.dp, shape = RoundedCornerShape(8.dp)),
-        shape = RoundedCornerShape(8.dp)
-    ){
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
-
-        ) {
-            CustomTextField(
-                value = harga,
-                onValueChange = { harga = it },
-                label = "value",
-                keyboardType = KeyboardType.Text
-            )
-        }
-
-    }
-
-    Button(
-        onClick = {
-        },
-        shape = RoundedCornerShape(20.dp),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp)
-
-    ) {
-        Text(text = "Generate QR")
     }
 }
 
