@@ -17,10 +17,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.dana.merchantapp.data.main.MainRepositoryImpl
 import com.dana.merchantapp.domain.main.MainUseCase
 import com.dana.merchantapp.presentation.screen.*
@@ -29,6 +31,8 @@ import com.dana.merchantapp.presentation.screen.history.HistoryScreen
 import com.dana.merchantapp.presentation.screen.home.HomeScreen
 import com.dana.merchantapp.presentation.screen.profile.ProfileScreen
 import com.dana.merchantapp.presentation.screen.qr.QrScreen
+import com.dana.merchantapp.presentation.screen.qr.scanqr.ScanCameraScreen
+import com.dana.merchantapp.presentation.screen.qr.scanqr.ScanResultScreen
 import com.dana.merchantapp.presentation.screen.withdrawal.WithdrawalScreen
 import com.dana.merchantapp.presentation.ui.component.navigation.BottomNavItem
 import com.dana.merchantapp.presentation.ui.component.navigation.CustomBottomNavigation
@@ -68,22 +72,16 @@ fun Main(mainViewModel: MainViewModel,navController: NavHostController = remembe
 
     Scaffold(
         bottomBar = {
-            if (currentRoute != Screen.QR.route) {
+            if (currentRoute != Screen.QR.route && currentRoute != Screen.ScanCamera.route && currentRoute != Screen.ScanResult.route) {
                 CustomBottomNavigation(navController)
             }
         },
         floatingActionButton = {
-            if (currentRoute != Screen.QR.route) {
+            if (currentRoute != Screen.QR.route && currentRoute != Screen.ScanCamera.route && currentRoute != Screen.ScanResult.route) {
                 FloatingActionButton(
                     onClick = {
                         val item = BottomNavItem("QR", Icons.Default.QrCode, Screen.QR)
-                        navController.navigate(item.screen.route) {
-                            popUpTo(navController.graph.findStartDestination().id) {
-                                saveState = true
-                            }
-                            restoreState = true
-                            launchSingleTop = true
-                        }
+                        navController.navigate(item.screen.route)
                     },
                     backgroundColor = BlueButton
 
@@ -105,8 +103,39 @@ fun Main(mainViewModel: MainViewModel,navController: NavHostController = remembe
                 HomeScreen(mainViewModel)
             }
             composable(Screen.QR.route) {
-                QrScreen()
+                QrScreen(navController)
             }
+            composable(
+                route = Screen.ScanCamera.route,
+                arguments = listOf(
+                    navArgument("harga") { type = NavType.IntType }
+                )
+            ) {
+                val id = it.arguments?.getInt("harga") ?: -1
+                ScanCameraScreen(
+                    navController = navController,
+                    harga = id,
+                )
+            }
+            composable(
+                route = Screen.ScanResult.route,
+                arguments = listOf(
+                    navArgument("harga") { type = NavType.IntType },
+                    navArgument("userId") { type = NavType.StringType }
+                )
+            ) {
+                val price = it.arguments?.getInt("harga") ?: -1
+                val id = it.arguments?.getString("userId") ?: ""
+                ScanResultScreen(
+                    navController=navController,
+                    harga = price,
+                    userId = id
+                )
+            }
+
+
+
+
             composable(Screen.Withdrawal.route) {
                 WithdrawalScreen()
             }
