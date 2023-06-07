@@ -28,11 +28,11 @@ class HistoryViewModel @Inject constructor (private val historyUseCase: HistoryU
         }
     }
 
-    fun convertTimestampToMonthYear(timestamp: Long): String {
-        return historyUseCase.convertTimestampToMonthYear(timestamp)
+    fun convertTimestampToDayMonthYear(timestamp: Long): String {
+        return historyUseCase.convertTimestampToDayMonthYear(timestamp)
     }
 
-    fun convertTimestampToFullDateTime(timestamp: Long): String {
-        return historyUseCase.convertTimestampToFullDateTime(timestamp)
+    fun convertTimestampToHourMinute(timestamp: Long): String {
+        return historyUseCase.convertTimestampToHourMinute(timestamp)
     }
 }

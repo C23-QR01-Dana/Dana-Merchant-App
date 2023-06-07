@@ -14,11 +14,11 @@ class HistoryUseCase @Inject constructor (private val historyRepository:HistoryR
         }
     }
 
-    fun convertTimestampToMonthYear(timestamp: Long): String {
-        return historyRepository.convertTimestampToMonthYear(timestamp)
+    fun convertTimestampToDayMonthYear(timestamp: Long): String {
+        return historyRepository.convertTimestampToDayMonthYear(timestamp)
     }
 
-    fun convertTimestampToFullDateTime(timestamp: Long): String {
-        return historyRepository.convertTimestampToFullDateTime(timestamp)
+    fun convertTimestampToHourMinute(timestamp: Long): String {
+        return historyRepository.convertTimestampToHourMinute(timestamp)
     }
 }

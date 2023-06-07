@@ -10,25 +10,25 @@ class HistoryRepositoryImpl: HistoryRepository {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
 
-    override fun convertTimestampToMonthYear(timestamp: Long): String {
+    override fun convertTimestampToDayMonthYear(timestamp: Long): String {
         val adjustedTimestamp = if (timestamp.toString().length <= 10) {
             timestamp * 1000
         } else {
             timestamp
         }
 
-        val dateFormat = SimpleDateFormat("MMMM yyyy", Locale.getDefault())
+        val dateFormat = SimpleDateFormat("dd MMMM yyyy", Locale.getDefault())
         return dateFormat.format(adjustedTimestamp)
     }
 
-    override fun convertTimestampToFullDateTime(timestamp: Long): String {
+    override fun convertTimestampToHourMinute(timestamp: Long): String {
         val adjustedTimestamp = if (timestamp.toString().length <= 10) {
             timestamp * 1000
         } else {
             timestamp
         }
 
-        val dateFormat = SimpleDateFormat("dd MMMM yyyy • HH:mm", Locale.getDefault())
+        val dateFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
         return dateFormat.format(adjustedTimestamp)
     }
 
