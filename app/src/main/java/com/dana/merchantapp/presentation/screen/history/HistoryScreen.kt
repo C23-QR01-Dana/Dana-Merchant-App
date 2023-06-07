@@ -12,6 +12,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.material.MaterialTheme
 import androidx.compose.ui.Alignment
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.dana.merchantapp.presentation.model.MerchantWithdrawTransaction
+import com.dana.merchantapp.presentation.model.PaymentTransaction
 import com.dana.merchantapp.presentation.model.Transaction
 
 @Composable
@@ -59,6 +61,35 @@ fun TransactionItem(transaction: Transaction, historyViewModel: HistoryViewModel
         Text(text = "Date: ${transaction.timestamp?.let { historyViewModel.convertTimestampToFullDateTime(it) } ?: "N/A"}", style = MaterialTheme.typography.body2)
         Text(text = "Transaction Type: ${transaction.trxType ?: "N/A"}", style = MaterialTheme.typography.body2)
         Text(text = "Merchant ID: ${transaction.merchantId ?: "N/A"}", style = MaterialTheme.typography.body2)
-        Text(text = "Payer ID: ${transaction.payerId ?: "N/A"}", style = MaterialTheme.typography.body2)
+
+        // Handle specific attributes for each transaction type
+        when (transaction) {
+            is PaymentTransaction -> {
+                Text(text = "Payer ID: ${transaction.payerId ?: "N/A"}", style = MaterialTheme.typography.body2)
+            }
+            is MerchantWithdrawTransaction -> {
+                Text(text = "Bank Account No: ${transaction.bankAccountNo ?: "N/A"}", style = MaterialTheme.typography.body2)
+                Text(text = "Bank Institution: ${transaction.bankInst ?: "N/A"}", style = MaterialTheme.typography.body2)
+            }
+        }
     }
 }
+
+//@Composable
+//fun TransactionItem(transaction: Transaction, historyViewModel: HistoryViewModel = hiltViewModel()) {
+//    Column(
+//        modifier = Modifier
+//            .padding(16.dp)
+//            .border(1.dp, Color.LightGray, RoundedCornerShape(8.dp))
+//            .padding(16.dp),
+//        verticalArrangement = Arrangement.spacedBy(8.dp),
+//        horizontalAlignment = Alignment.Start
+//    ) {
+//        Text(text = "Amount: Rp${transaction.amount ?: 0}", style = MaterialTheme.typography.body1)
+//        Spacer(Modifier.height(4.dp))
+//        Text(text = "Date: ${transaction.timestamp?.let { historyViewModel.convertTimestampToFullDateTime(it) } ?: "N/A"}", style = MaterialTheme.typography.body2)
+//        Text(text = "Transaction Type: ${transaction.trxType ?: "N/A"}", style = MaterialTheme.typography.body2)
+//        Text(text = "Merchant ID: ${transaction.merchantId ?: "N/A"}", style = MaterialTheme.typography.body2)
+//        Text(text = "Payer ID: ${transaction.payerId ?: "N/A"}", style = MaterialTheme.typography.body2)
+//    }
+//}

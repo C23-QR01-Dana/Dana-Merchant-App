@@ -36,32 +36,3 @@ class HistoryViewModel @Inject constructor (private val historyUseCase: HistoryU
         return historyUseCase.convertTimestampToFullDateTime(timestamp)
     }
 }
-
-//@HiltViewModel
-//class StaticQrViewModel @Inject constructor(private val qrUseCase: QRUseCase) : ViewModel() {
-//
-//    private val _qrCodeBitmap = mutableStateOf<Bitmap?>(null)
-//    val qrCodeBitmap: State<Bitmap?> get() = _qrCodeBitmap
-//
-//    private val _merchant = mutableStateOf<Merchant?>(null)
-//    val merchant: State<Merchant?> get() = _merchant
-//
-//
-//    fun generateStaticQR() {
-//        _qrCodeBitmap.value = qrUseCase.generateStaticQR()
-//    }
-//
-//    fun getMerchant() {
-//        viewModelScope.launch {
-//            qrUseCase.getMerchant { merchant ->
-//                if (merchant != null) {
-//                    _merchant.value = merchant
-//                } else {
-//                    _merchant.value = null
-//                }
-//            }
-//        }
-//    }
-//
-//
-//}
