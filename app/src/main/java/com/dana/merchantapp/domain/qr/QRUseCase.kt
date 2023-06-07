@@ -20,4 +20,10 @@ class QRUseCase  @Inject constructor (private val qrRepository: QRRepository) {
             callback(merchant)
         }
     }
+
+    fun transaction(amount: Int, payerId: String, timestamp: Long, trxType: String, callback: (Boolean) -> Unit){
+        qrRepository.transaction(amount, payerId, timestamp, trxType) { isSuccess->
+            callback(isSuccess)
+        }
+    }
 }
