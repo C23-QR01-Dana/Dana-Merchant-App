@@ -1,6 +1,6 @@
-package com.dana.merchantapp.data.qr
+package com.dana.merchantapp.data.home
 
-import com.dana.merchantapp.presentation.model.Merchant
+import com.dana.merchantapp.data.model.Merchant
 import com.google.firebase.firestore.DocumentSnapshot
 
 object MerchantMapper {

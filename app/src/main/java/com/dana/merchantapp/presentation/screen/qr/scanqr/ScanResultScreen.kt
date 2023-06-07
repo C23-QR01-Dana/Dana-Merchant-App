@@ -42,17 +42,18 @@ fun ScanResultScreen(scanResultViewModel: ScanResultViewModel = hiltViewModel(),
     scanResultViewModel.transactionResult.observe(lifecycleOwner) { isSuccess ->
         if (isSuccess) {
             Toast.makeText(context, "Payment Success", Toast.LENGTH_SHORT).show()
-            navController.navigate(Screen.History.route) {
+            navController.navigate(Screen.Home.route) {
                 popUpTo(navController.graph.findStartDestination().id) {
-                    saveState = true
+                    inclusive = true
                 }
-                launchSingleTop = true
+                restoreState = true
             }
         }
         else{
             Toast.makeText(context, "Payment Error", Toast.LENGTH_SHORT).show()
         }
     }
+
 
 
     Column(
@@ -64,7 +65,7 @@ fun ScanResultScreen(scanResultViewModel: ScanResultViewModel = hiltViewModel(),
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                ,
+            ,
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {

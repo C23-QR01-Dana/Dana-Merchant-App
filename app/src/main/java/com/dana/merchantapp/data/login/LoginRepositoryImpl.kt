@@ -1,11 +1,11 @@
 package com.dana.merchantapp.data.login
 
 import android.util.Log
+import com.dana.merchantapp.domain.login.LoginRepository
 import com.google.firebase.auth.FirebaseAuth
+import javax.inject.Inject
 
-class LoginRepositoryImpl: LoginRepository {
-    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
-
+class LoginRepositoryImpl @Inject constructor (private val auth: FirebaseAuth): LoginRepository {
     override fun loginUser(email: String, password: String, callback: (Boolean, String) -> Unit) {
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
