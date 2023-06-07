@@ -83,19 +83,6 @@ fun HomeScreen(mainViewModel: MainViewModel) {
                 }
             }
         }
-
-        Button(
-            onClick = {
-                mainViewModel.logoutUser()
-            },
-            shape = RoundedCornerShape(20.dp),
-
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            Text(text = "Logout")
-        }
     }
 
 }
