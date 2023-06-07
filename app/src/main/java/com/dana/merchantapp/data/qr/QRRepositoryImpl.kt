@@ -4,15 +4,17 @@ import android.graphics.Bitmap
 import android.util.Log
 import androidmads.library.qrgenearator.QRGContents
 import androidmads.library.qrgenearator.QRGEncoder
-import com.dana.merchantapp.presentation.model.Merchant
+import com.dana.merchantapp.data.home.MerchantMapper
+import com.dana.merchantapp.data.model.Merchant
+import com.dana.merchantapp.domain.qr.QRRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import java.util.*
+import javax.inject.Inject
 
 
-class QRRepositoryImpl: QRRepository {
-    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
-    private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
+class QRRepositoryImpl @Inject constructor (private val auth: FirebaseAuth, private val firestore: FirebaseFirestore):
+    QRRepository {
 
     override fun generateStaticQR(): Bitmap {
         val content = "DANA#MPM#" + auth.currentUser?.uid
@@ -56,21 +58,18 @@ class QRRepositoryImpl: QRRepository {
     override fun transaction(amount: Int, payerId: String, timestamp: Long, trxType: String, callback: (Boolean) -> Unit) {
         val user = auth.currentUser
         val merchantId = user?.uid
-        val id = UUID.randomUUID().toString()
-
-        val transactionData = hashMapOf(
-            "amount" to amount,
-            "id" to id,
-            "merchantId" to merchantId,
-            "payerId" to payerId,
-            "timestamp" to timestamp,
-            "trxType" to trxType,
-
-        )
 
         if (merchantId != null) {
-            firestore.collection("transaction").document(id)
-                .set(transactionData)
+            val db = firestore.collection("transaction").document()
+            val transactionData = hashMapOf(
+                "amount" to amount,
+                "id" to db.id,
+                "merchantId" to merchantId,
+                "payerId" to payerId,
+                "timestamp" to timestamp,
+                "trxType" to trxType,
+                )
+            db.set(transactionData)
                 .addOnSuccessListener {
                     Log.v("transaction", "Data successfully saved to Firestore")
                     callback(true)

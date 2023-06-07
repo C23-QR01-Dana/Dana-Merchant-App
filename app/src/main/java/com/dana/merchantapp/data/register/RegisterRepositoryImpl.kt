@@ -1,14 +1,14 @@
 package com.dana.merchantapp.data.register
 
 import android.util.Log
+import com.dana.merchantapp.domain.register.RegisterRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import javax.inject.Inject
 
 
-class RegisterRepositoryImpl : RegisterRepository {
-    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
-    private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
-
+class RegisterRepositoryImpl @Inject constructor (private val auth: FirebaseAuth, private val firestore: FirebaseFirestore) :
+    RegisterRepository {
     override fun registerUser(name: String, address: String,email: String, password: String, callback: (Boolean, String) -> Unit) {
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->

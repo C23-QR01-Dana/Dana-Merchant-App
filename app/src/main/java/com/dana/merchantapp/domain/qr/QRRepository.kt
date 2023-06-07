@@ -1,7 +1,7 @@
-package com.dana.merchantapp.data.qr
+package com.dana.merchantapp.domain.qr
 
 import android.graphics.Bitmap
-import com.dana.merchantapp.presentation.model.Merchant
+import com.dana.merchantapp.data.model.Merchant
 
 interface QRRepository {
     fun generateStaticQR(): Bitmap

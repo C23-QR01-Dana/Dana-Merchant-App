@@ -5,14 +5,18 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.dana.merchantapp.domain.qr.QRUseCase
-import com.dana.merchantapp.presentation.model.Merchant
+import com.dana.merchantapp.data.model.Merchant
+import com.dana.merchantapp.domain.home.GetMerchant
+import com.dana.merchantapp.domain.qr.GenerateStaticQR
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class StaticQrViewModel @Inject constructor(private val qrUseCase: QRUseCase) : ViewModel() {
+class StaticQrViewModel @Inject constructor(
+    private val generateStaticQR: GenerateStaticQR,
+    private val getMerchant: GetMerchant
+    ) : ViewModel() {
 
     private val _qrCodeBitmap = mutableStateOf<Bitmap?>(null)
     val qrCodeBitmap: State<Bitmap?> get() = _qrCodeBitmap
@@ -20,14 +24,13 @@ class StaticQrViewModel @Inject constructor(private val qrUseCase: QRUseCase) : 
     private val _merchant = mutableStateOf<Merchant?>(null)
     val merchant: State<Merchant?> get() = _merchant
 
-
     fun generateStaticQR() {
-        _qrCodeBitmap.value = qrUseCase.generateStaticQR()
+        _qrCodeBitmap.value = generateStaticQR.generateStaticQR()
     }
 
     fun getMerchant() {
         viewModelScope.launch {
-            qrUseCase.getMerchant { merchant ->
+            getMerchant.getMerchant { merchant ->
                 if (merchant != null) {
                     _merchant.value = merchant
                 } else {

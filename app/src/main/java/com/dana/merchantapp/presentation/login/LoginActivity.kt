@@ -37,41 +37,26 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.dana.merchantapp.R
-import com.dana.merchantapp.data.login.LoginRepositoryImpl
-import com.dana.merchantapp.domain.login.LoginUseCase
 import com.dana.merchantapp.presentation.main.MainActivity
 import com.dana.merchantapp.presentation.ui.component.CustomTextField
 import com.dana.merchantapp.presentation.ui.theme.BluePrimary
 import com.dana.merchantapp.presentation.ui.theme.MerchantAppTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class LoginActivity: ComponentActivity() {
-    private lateinit var loginViewModel: LoginViewModel
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        val loginRepository = LoginRepositoryImpl()
-        val loginUseCase = LoginUseCase(loginRepository)
-        loginViewModel = LoginViewModel(loginUseCase)
-
-        loginViewModel.loginResult.observe(this) { isSuccess ->
-            if (isSuccess) {
-                val intent = Intent(this, MainActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
-                startActivity(intent)
-            }
-        }
-
-        loginViewModel.loginMessage.observe(this) { message ->
-            Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-        }
 
         setContent {
             MerchantAppTheme {
@@ -79,7 +64,7 @@ class LoginActivity: ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    LoginScreen(loginViewModel)
+                    LoginScreen()
                 }
             }
         }
@@ -87,11 +72,26 @@ class LoginActivity: ComponentActivity() {
 }
 
 @Composable
-fun LoginScreen(loginViewModel: LoginViewModel) {
+fun LoginScreen(loginViewModel: LoginViewModel = hiltViewModel()) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordHidden by remember { mutableStateOf(true) }
     val scrollState = rememberScrollState()
+
+    val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    loginViewModel.loginResult.observe(lifecycleOwner) { isSuccess ->
+        if (isSuccess) {
+            val intent = Intent(context, MainActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+            context.startActivity(intent)
+        }
+    }
+
+    loginViewModel.loginMessage.observe(lifecycleOwner) { message ->
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+    }
 
     Card (
         modifier = Modifier
@@ -164,11 +164,8 @@ fun LoginScreen(loginViewModel: LoginViewModel) {
 @Preview(showBackground = true)
 @Composable
 fun LoginScreenPreview() {
-    val loginRepository = LoginRepositoryImpl()
-    val loginUseCase = LoginUseCase(loginRepository)
-    val loginViewModel = LoginViewModel(loginUseCase)
 
     MerchantAppTheme {
-        LoginScreen(loginViewModel)
+        LoginScreen()
     }
 }
