@@ -3,6 +3,7 @@ package com.dana.merchantapp.presentation.screen.profile
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -26,18 +27,23 @@ import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Snackbar
+import androidx.compose.material.SnackbarDuration
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.material.icons.filled.AttachMoney
 import androidx.compose.material.icons.filled.Camera
 import androidx.compose.material.icons.filled.Payment
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -62,11 +68,13 @@ import coil.compose.rememberImagePainter
 import com.dana.merchantapp.R
 import com.dana.merchantapp.presentation.landing.LandingActivity
 import com.dana.merchantapp.presentation.ui.theme.BluePrimary
+import kotlinx.coroutines.launch
 
 @Composable
 fun ProfileScreen(navController: NavController, profileViewModel: ProfileViewModel = hiltViewModel()) {
     val maxFileSizeBytes = 5 * 1024 * 1024
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
     val launcher = rememberLauncherForActivityResult(contract =
     ActivityResultContracts.PickVisualMedia()) { uri: Uri? ->
         if (uri != null) {
@@ -74,7 +82,9 @@ fun ProfileScreen(navController: NavController, profileViewModel: ProfileViewMod
             contentResolver.openInputStream(uri)?.use { inputStream ->
                 val fileSizeBytes = inputStream.available()
                 if (fileSizeBytes > maxFileSizeBytes) {
-                    Log.w("kegedean", "File size is too large")
+                    coroutineScope.launch {
+                        Toast.makeText(context, "File Size Must Not Exceed 5 MB", Toast.LENGTH_SHORT).show()
+                    }
                 } else {
                     profileViewModel.updatePhoto(uri)
                 }
@@ -82,30 +92,37 @@ fun ProfileScreen(navController: NavController, profileViewModel: ProfileViewMod
         }
     }
 
-    val isSuccess: Boolean by profileViewModel.logoutResult.observeAsState(false)
-
     LaunchedEffect(Unit) {
         profileViewModel.getMerchant()
     }
 
-    LaunchedEffect(isSuccess) {
-        if (isSuccess) {
-            // Navigate to the LandingActivity
-            val intent = Intent(
-                context,
-                LandingActivity::class.java
-            ).apply {
-                flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
-            }
-            context.startActivity(intent)
+    val isSuccess: Boolean by profileViewModel.logoutResult
+
+    if (isSuccess) {
+        // Navigate to the LandingActivity
+        val intent = Intent(
+            context,
+            LandingActivity::class.java
+        ).apply {
+            flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
         }
+        context.startActivity(intent)
     }
 
+    val isUploading: Boolean by profileViewModel.isUploading
+
+    LaunchedEffect(isUploading) {
+        if (isUploading) {
+            coroutineScope.launch {
+                Toast.makeText(context, "Uploading...", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
 
     Column(
         modifier = Modifier
             .fillMaxSize(),
-        verticalArrangement = Arrangement.Top
+        verticalArrangement = Arrangement.Top,
     ) {
         Row(
             modifier = Modifier

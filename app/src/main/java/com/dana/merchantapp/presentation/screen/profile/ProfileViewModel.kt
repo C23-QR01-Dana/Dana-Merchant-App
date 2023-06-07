@@ -16,10 +16,10 @@ import javax.inject.Inject
 class ProfileViewModel @Inject constructor(private val profileUseCase: ProfileUseCase) : ViewModel() {
     private val _merchant = mutableStateOf<Merchant?>(null)
     val merchant: State<Merchant?> get() = _merchant
-    private val _logoutResult: MutableLiveData<Boolean> = MutableLiveData()
-    val logoutResult: LiveData<Boolean> = _logoutResult
-    private val _logoutMessage: MutableLiveData<String> = MutableLiveData()
-    val logoutMessage: LiveData<String> = _logoutMessage
+    private val _logoutResult = mutableStateOf<Boolean>(false)
+    val logoutResult: State<Boolean> get() = _logoutResult
+    private val _isUploading = mutableStateOf<Boolean>(false)
+    val isUploading: State<Boolean> get() = _isUploading
 
     fun getMerchant() {
         profileUseCase.getMerchant { merchant ->
@@ -32,8 +32,10 @@ class ProfileViewModel @Inject constructor(private val profileUseCase: ProfileUs
     }
 
     fun updatePhoto(imageUri: Uri) {
+        _isUploading.value = true
         profileUseCase.updatePhoto(imageUri) { isSuccess ->
             if (isSuccess) {
+                _isUploading.value = false
                 getMerchant()
             }
         }
@@ -41,7 +43,6 @@ class ProfileViewModel @Inject constructor(private val profileUseCase: ProfileUs
 
     fun logoutUser() {
         profileUseCase.logoutUser { isSuccess, message ->
-            _logoutMessage.value = message
             _logoutResult.value = isSuccess
         }
     }
