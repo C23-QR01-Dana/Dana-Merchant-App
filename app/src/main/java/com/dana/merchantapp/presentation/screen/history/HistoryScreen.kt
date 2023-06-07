@@ -1,32 +1,34 @@
 package com.dana.merchantapp.presentation.screen.history
 
 import android.icu.text.NumberFormat
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Divider
-import androidx.compose.material.Icon
+import androidx.compose.material.*
 import androidx.compose.ui.graphics.Color
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.SouthWest
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.hilt.navigation.compose.hiltViewModel
-import coil.compose.rememberImagePainter
 import com.dana.merchantapp.presentation.model.MerchantWithdrawTransaction
 import com.dana.merchantapp.presentation.model.PaymentTransaction
 import com.dana.merchantapp.presentation.model.Transaction
 import com.dana.merchantapp.presentation.ui.theme.BluePrimary
+import kotlinx.coroutines.launch
 import java.util.*
 
 @Composable
@@ -35,32 +37,50 @@ fun HistoryScreen(historyViewModel: HistoryViewModel = hiltViewModel()) {
     TransactionHistory(transactions = historyViewModel.transactions.value, historyViewModel = historyViewModel)
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun TransactionHistory(transactions: List<Transaction>?, historyViewModel: HistoryViewModel = hiltViewModel()) {
     val sortedTransactions = transactions?.sortedByDescending { it.timestamp }
     val transactionsByDate = sortedTransactions?.filter { it.timestamp != null }?.groupBy { historyViewModel.convertTimestampToDayMonthYear(it.timestamp!!) }
 
+    val refreshScope = rememberCoroutineScope()
+    var refreshing by remember { mutableStateOf(false) }
+
+    fun refresh() = refreshScope.launch {
+        refreshing = true
+        historyViewModel.getTransactionsFromFirestore()
+        refreshing = false
+    }
+
+    val state = rememberPullRefreshState(refreshing, ::refresh)
+
     MaterialTheme {
-        LazyColumn {
-            transactionsByDate?.forEach { (month, transactionsForMonth) ->
-                item {
-                    Text(
-                        text = month,
-                        modifier = Modifier.padding(16.dp),
-                        style = MaterialTheme.typography.h6
-                    )
-                }
-                items(transactionsForMonth.size) { index ->
-                    val transaction = transactionsForMonth[index]
-                    TransactionItem(transaction = transaction, historyViewModel = historyViewModel)
-                }
-                item {
-                    Divider(
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                        color = Color.LightGray
-                    )
+        Box(Modifier.pullRefresh(state)) {
+            LazyColumn {
+                transactionsByDate?.forEach { (month, transactionsForMonth) ->
+                    item {
+                        Text(
+                            text = month,
+                            modifier = Modifier.padding(16.dp),
+                            style = MaterialTheme.typography.h6
+                        )
+                    }
+                    items(transactionsForMonth.size) { index ->
+                        val transaction = transactionsForMonth[index]
+                        TransactionItem(
+                            transaction = transaction,
+                            historyViewModel = historyViewModel
+                        )
+                    }
+                    item {
+                        Divider(
+                            modifier = Modifier.padding(horizontal = 16.dp),
+                            color = Color.LightGray
+                        )
+                    }
                 }
             }
+            PullRefreshIndicator(refreshing, state, Modifier.align(Alignment.TopCenter))
         }
     }
 }
@@ -70,19 +90,26 @@ fun TransactionItem(transaction: Transaction, historyViewModel: HistoryViewModel
     var transactionTitle = "N/A"
     var transactionType = "N/A"
     var transactionAmount = "0"
+    var transactionIcon = Icons.Default.QuestionMark
+    var transactionSecondIcon = Icons.Default.QuestionMark
+    var transactionSecondIconBackgroundColor = Color(0x00000000)
     val amountFormatter = NumberFormat.getNumberInstance(Locale.US)
 
     if (transaction is PaymentTransaction) {
         transactionTitle = "Customer Payment"
         transactionType = "Incoming"
         transactionAmount = "+ IDR ${amountFormatter.format(transaction.amount ?: 0)}"
+        transactionIcon = Icons.Default.Group
+        transactionSecondIcon = Icons.Default.SouthWest
+        transactionSecondIconBackgroundColor = Color(0xFF00C853)
     } else if (transaction is MerchantWithdrawTransaction) {
         transactionTitle = "Withdraw to ${transaction.bankInst}"
         transactionType = "Outgoing"
         transactionAmount = "IDR ${amountFormatter.format(transaction.amount ?: 0)}"
+        transactionIcon = Icons.Default.AccountBalance
+        transactionSecondIcon = Icons.Default.NorthEast
+        transactionSecondIconBackgroundColor = Color(0xFFE53935)
     }
-
-
 
     Row(
         modifier = Modifier
@@ -91,26 +118,43 @@ fun TransactionItem(transaction: Transaction, historyViewModel: HistoryViewModel
             .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
-//        Image(
-//            painter = rememberImagePainter(data = "https://seeklogo.com/images/V/valorant-logo-FAB2CA0E55-seeklogo.com.png"),
-//            contentDescription = "Transaction Image",
-//            modifier = Modifier
-//                .size(48.dp)
-//                .clip(CircleShape)
-//        )
         Box(
             modifier = Modifier
-                .size(32.dp)
-                .clip(CircleShape)
-                .background(BluePrimary)
+                .size(52.dp)
         ) {
-            Icon(
-                imageVector = Icons.Default.SouthWest,
-                contentDescription = "Incoming Payment",
-                tint = Color.White,
+            Box(
                 modifier = Modifier
-                    .size(48.dp)
-            )
+                    .align(Alignment.CenterStart)
+                    .size(44.dp)
+                    .clip(CircleShape)
+                    .background(BluePrimary)
+            ) {
+                Icon(
+                    imageVector = transactionIcon,
+                    contentDescription = "Incoming Payment",
+                    tint = Color.White,
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .size(22.dp)
+                        .clip(CircleShape)
+                )
+            }
+            Box(
+                modifier = Modifier
+                    .size(22.dp)
+                    .align(Alignment.BottomEnd)
+                    .clip(CircleShape)
+                    .background(transactionSecondIconBackgroundColor)
+            ) {
+                Icon(
+                    imageVector = transactionSecondIcon,
+                    contentDescription = "Incoming Payment",
+                    tint = Color.White,
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .size(18.dp)
+                )
+            }
         }
         Column(
             modifier = Modifier
@@ -146,36 +190,6 @@ fun TransactionItem(transaction: Transaction, historyViewModel: HistoryViewModel
                 text = transactionType,
                 style = MaterialTheme.typography.caption
             )
-        }
-    }
-}
-
-
-@Composable
-fun OldTransactionItem(transaction: Transaction, historyViewModel: HistoryViewModel = hiltViewModel()) {
-    Column(
-        modifier = Modifier
-            .padding(16.dp)
-            .border(1.dp, Color.LightGray, RoundedCornerShape(8.dp))
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        horizontalAlignment = Alignment.Start
-    ) {
-        Text(text = "Amount: Rp${transaction.amount ?: 0}", style = MaterialTheme.typography.body1)
-        Spacer(Modifier.height(4.dp))
-        Text(text = "Date: ${transaction.timestamp?.let { historyViewModel.convertTimestampToHourMinute(it) } ?: "N/A"}", style = MaterialTheme.typography.body2)
-        Text(text = "Transaction Type: ${transaction.trxType ?: "N/A"}", style = MaterialTheme.typography.body2)
-        Text(text = "Merchant ID: ${transaction.merchantId ?: "N/A"}", style = MaterialTheme.typography.body2)
-
-        // Handle specific attributes for each transaction type
-        when (transaction) {
-            is PaymentTransaction -> {
-                Text(text = "Payer ID: ${transaction.payerId ?: "N/A"}", style = MaterialTheme.typography.body2)
-            }
-            is MerchantWithdrawTransaction -> {
-                Text(text = "Bank Account No: ${transaction.bankAccountNo ?: "N/A"}", style = MaterialTheme.typography.body2)
-                Text(text = "Bank Institution: ${transaction.bankInst ?: "N/A"}", style = MaterialTheme.typography.body2)
-            }
         }
     }
 }
