@@ -47,20 +47,6 @@ class MainActivity : ComponentActivity() {
         val mainUseCase = MainUseCase(mainRepository)
         mainViewModel = MainViewModel(mainUseCase)
 
-        mainViewModel.logoutResult.observe(this) { isSuccess ->
-            if (isSuccess) {
-                val intent = Intent(this, LandingActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
-                startActivity(intent)
-            }
-        }
-
-        mainViewModel.logoutMessage.observe(this) { message ->
-            if (message.isNotEmpty()) {
-                Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-            }
-        }
-
         setContent {
             MerchantAppTheme {
                 // A surface container using the 'background' color from the theme
@@ -129,7 +115,7 @@ fun Main(mainViewModel: MainViewModel,navController: NavHostController = remembe
             }
 
             composable(Screen.Profile.route) {
-                ProfileScreen()
+                ProfileScreen(navController)
             }
         }
         // Content area
