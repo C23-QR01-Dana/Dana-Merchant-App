@@ -1,6 +1,8 @@
 package com.dana.merchantapp.di
 
 
+import com.dana.merchantapp.domain.history.HistoryRepository
+import com.dana.merchantapp.data.history.HistoryRepositoryImpl
 import com.dana.merchantapp.data.home.HomeRepositoryImpl
 import com.dana.merchantapp.data.login.LoginRepositoryImpl
 import com.dana.merchantapp.domain.profile.ProfileRepository
@@ -33,5 +35,8 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun provideHomeRepository(homeRepositoryImpl: HomeRepositoryImpl): HomeRepository
+
+    @Binds
+    abstract fun provideHistoryRepository(historyRepositoryImpl: HistoryRepositoryImpl): HistoryRepository
 }
 
