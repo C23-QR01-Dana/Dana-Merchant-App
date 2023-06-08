@@ -12,5 +12,10 @@ sealed class Screen(val route: String) {
     object ScanResult : Screen("scanResult/{harga}/{userId}") {
         fun createRoute(harga: String, userId: String) = "scanResult/$harga/$userId"
     }
+    object BankSelect : Screen("bankSelect")
+    object AddBank : Screen("addBank")
+    object WithdrawAmount : Screen("withdrawAmount/{bankAccountNo}/{bankInst}") {
+        fun createRoute(bankAccountNo: String, bankInst: String) = "withdrawAmount/$bankAccountNo/$bankInst"
+    }
 
 }
