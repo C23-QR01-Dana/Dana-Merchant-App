@@ -23,6 +23,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.text.font.FontWeight
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.dana.merchantapp.data.model.MerchantWithdrawTransaction
 import com.dana.merchantapp.data.model.PaymentTransaction
@@ -55,32 +58,58 @@ fun TransactionHistory(transactions: List<Transaction>?, historyViewModel: Histo
     val state = rememberPullRefreshState(refreshing, ::refresh)
 
     MaterialTheme {
-        Box(Modifier.pullRefresh(state)) {
-            LazyColumn {
-                transactionsByDate?.forEach { (month, transactionsForMonth) ->
-                    item {
-                        Text(
-                            text = month,
-                            modifier = Modifier.padding(16.dp),
-                            style = MaterialTheme.typography.h6
+        Column {
+            TopAppBar(
+                backgroundColor = BluePrimary,
+                title = {
+                    Text(
+                        text = "Transaction History",
+                        style = MaterialTheme.typography.h6,
+                        fontWeight = FontWeight.Bold
+                    )
+                },
+                modifier = Modifier
+                    .background(
+                        brush = Brush.linearGradient(
+                            colors = listOf(Color(0xFF86B0FF), Color(0xFF408CE2)),
+                            start = Offset.Zero,
+                            end = Offset.Infinite
                         )
-                    }
-                    items(transactionsForMonth.size) { index ->
-                        val transaction = transactionsForMonth[index]
-                        TransactionItem(
-                            transaction = transaction,
-                            historyViewModel = historyViewModel
-                        )
-                    }
-                    item {
-                        Divider(
-                            modifier = Modifier.padding(horizontal = 16.dp),
-                            color = Color.LightGray
-                        )
+                    ),
+                actions = {
+                    IconButton(onClick = { /* Add filter action here */ }) {
+                        Icon(Icons.Filled.FilterList, contentDescription = "Filter")
                     }
                 }
+            )
+
+            Box(Modifier.pullRefresh(state)) {
+                LazyColumn {
+                    transactionsByDate?.forEach { (month, transactionsForMonth) ->
+                        item {
+                            Text(
+                                text = month,
+                                modifier = Modifier.padding(16.dp),
+                                style = MaterialTheme.typography.h6
+                            )
+                        }
+                        items(transactionsForMonth.size) { index ->
+                            val transaction = transactionsForMonth[index]
+                            TransactionItem(
+                                transaction = transaction,
+                                historyViewModel = historyViewModel
+                            )
+                        }
+                        item {
+                            Divider(
+                                modifier = Modifier.padding(horizontal = 16.dp),
+                                color = Color.LightGray
+                            )
+                        }
+                    }
+                }
+                PullRefreshIndicator(refreshing, state, Modifier.align(Alignment.TopCenter))
             }
-            PullRefreshIndicator(refreshing, state, Modifier.align(Alignment.TopCenter))
         }
     }
 }
@@ -131,7 +160,7 @@ fun TransactionItem(transaction: Transaction, historyViewModel: HistoryViewModel
             ) {
                 Icon(
                     imageVector = transactionIcon,
-                    contentDescription = "Incoming Payment",
+                    contentDescription = "Payment Group",
                     tint = Color.White,
                     modifier = Modifier
                         .align(Alignment.Center)
@@ -148,7 +177,7 @@ fun TransactionItem(transaction: Transaction, historyViewModel: HistoryViewModel
             ) {
                 Icon(
                     imageVector = transactionSecondIcon,
-                    contentDescription = "Incoming Payment",
+                    contentDescription = "Incoming/Outgoing Payment",
                     tint = Color.White,
                     modifier = Modifier
                         .align(Alignment.Center)
