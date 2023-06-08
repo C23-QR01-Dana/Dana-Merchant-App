@@ -1,11 +1,11 @@
 package com.dana.merchantapp.presentation.screen.history
 
 import com.dana.merchantapp.domain.history.HistoryUseCase
-import com.dana.merchantapp.presentation.model.Transaction
 import androidx.compose.runtime.*
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.dana.merchantapp.data.model.Transaction
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject

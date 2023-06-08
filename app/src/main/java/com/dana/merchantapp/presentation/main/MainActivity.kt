@@ -23,8 +23,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.dana.merchantapp.data.main.MainRepositoryImpl
-import com.dana.merchantapp.domain.main.MainUseCase
 import com.dana.merchantapp.presentation.screen.*
 import com.dana.merchantapp.presentation.landing.LandingActivity
 import com.dana.merchantapp.presentation.screen.history.HistoryScreen
@@ -43,13 +41,8 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    private lateinit var mainViewModel: MainViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        val mainRepository = MainRepositoryImpl()
-        val mainUseCase = MainUseCase(mainRepository)
-        mainViewModel = MainViewModel(mainUseCase)
 
         setContent {
             MerchantAppTheme {
@@ -58,7 +51,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    Main(mainViewModel)
+                    Main()
                 }
             }
         }
@@ -66,7 +59,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Main(mainViewModel: MainViewModel,navController: NavHostController = rememberNavController()) {
+fun Main(navController: NavHostController = rememberNavController()) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
@@ -100,7 +93,7 @@ fun Main(mainViewModel: MainViewModel,navController: NavHostController = remembe
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(Screen.Home.route) {
-                HomeScreen(mainViewModel)
+                HomeScreen()
             }
             composable(Screen.QR.route) {
                 QrScreen(navController)
@@ -152,14 +145,14 @@ fun Main(mainViewModel: MainViewModel,navController: NavHostController = remembe
 
 }
 
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    val mainRepository = MainRepositoryImpl()
-    val mainUseCase = MainUseCase(mainRepository)
-    val mainViewModel = MainViewModel(mainUseCase)
-
-    MerchantAppTheme {
-        Main(mainViewModel)
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun DefaultPreview() {
+//    val mainRepository = MainRepositoryImpl()
+//    val mainUseCase = MainUseCase(mainRepository)
+//    val mainViewModel = MainViewModel(mainUseCase)
+//
+//    MerchantAppTheme {
+//        Main(mainViewModel)
+//    }
+//}

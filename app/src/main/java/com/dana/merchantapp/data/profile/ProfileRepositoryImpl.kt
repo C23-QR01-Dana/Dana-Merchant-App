@@ -1,17 +1,16 @@
 package com.dana.merchantapp.data.profile
 
 import android.net.Uri
-import com.dana.merchantapp.data.qr.MerchantMapper
-import com.dana.merchantapp.presentation.model.Merchant
+import com.dana.merchantapp.data.home.MerchantMapper
+import com.dana.merchantapp.data.model.Merchant
+import com.dana.merchantapp.domain.profile.ProfileRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
+import javax.inject.Inject
 
-class ProfileRepositoryImpl: ProfileRepository {
-    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
-    private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
-    private val storage: FirebaseStorage = FirebaseStorage.getInstance()
-
+class ProfileRepositoryImpl @Inject constructor (private val auth: FirebaseAuth, private val firestore: FirebaseFirestore, private val storage: FirebaseStorage):
+    ProfileRepository {
 
     override fun getMerchant(callback: (Merchant?) -> Unit) {
         val merchantId = auth.currentUser?.uid

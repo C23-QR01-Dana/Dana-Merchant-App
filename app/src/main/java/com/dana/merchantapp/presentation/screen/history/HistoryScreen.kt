@@ -24,9 +24,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.dana.merchantapp.presentation.model.MerchantWithdrawTransaction
-import com.dana.merchantapp.presentation.model.PaymentTransaction
-import com.dana.merchantapp.presentation.model.Transaction
+import com.dana.merchantapp.data.model.MerchantWithdrawTransaction
+import com.dana.merchantapp.data.model.PaymentTransaction
+import com.dana.merchantapp.data.model.Transaction
 import com.dana.merchantapp.presentation.ui.theme.BluePrimary
 import kotlinx.coroutines.launch
 import java.util.*

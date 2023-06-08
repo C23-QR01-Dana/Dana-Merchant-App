@@ -5,7 +5,7 @@ import com.dana.merchantapp.data.history.HistoryRepository
 import javax.inject.Inject
 
 import kotlin.Unit
-import com.dana.merchantapp.presentation.model.Transaction
+import com.dana.merchantapp.data.model.Transaction
 
 class HistoryUseCase @Inject constructor (private val historyRepository:HistoryRepository){
     fun getTransactionsFromFirestore(callback: (List<Transaction>?) -> Unit) {

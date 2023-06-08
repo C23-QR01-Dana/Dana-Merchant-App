@@ -1,4 +1,4 @@
-package com.dana.merchantapp.presentation.model
+package com.dana.merchantapp.data.model
 
 open class Transaction(
     open val amount: Int?,
@@ -26,7 +26,3 @@ data class MerchantWithdrawTransaction(
     val bankAccountNo: String?,
     val bankInst: String?
 ) : Transaction(amount, id, merchantId, timestamp, trxType)
-
-//{
-//    constructor() : this(null, null, null, null, null, null)
-//}

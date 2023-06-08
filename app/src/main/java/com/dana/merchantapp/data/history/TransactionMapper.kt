@@ -1,8 +1,8 @@
 package com.dana.merchantapp.data.history
 
-import com.dana.merchantapp.presentation.model.MerchantWithdrawTransaction
-import com.dana.merchantapp.presentation.model.PaymentTransaction
-import com.dana.merchantapp.presentation.model.Transaction
+import com.dana.merchantapp.data.model.MerchantWithdrawTransaction
+import com.dana.merchantapp.data.model.PaymentTransaction
+import com.dana.merchantapp.data.model.Transaction
 import com.google.firebase.firestore.DocumentSnapshot
 
 //object TransactionMapper {

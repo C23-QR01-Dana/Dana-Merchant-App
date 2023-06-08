@@ -1,7 +1,7 @@
-package com.dana.merchantapp.data.profile
+package com.dana.merchantapp.domain.profile
 
 import android.net.Uri
-import com.dana.merchantapp.presentation.model.Merchant
+import com.dana.merchantapp.data.model.Merchant
 
 interface ProfileRepository {
     fun getMerchant(callback: (Merchant?) -> Unit)

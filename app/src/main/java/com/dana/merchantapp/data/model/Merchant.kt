@@ -1,4 +1,4 @@
-package com.dana.merchantapp.presentation.model
+package com.dana.merchantapp.data.model
 
 data class Merchant(
     val balance: Int,

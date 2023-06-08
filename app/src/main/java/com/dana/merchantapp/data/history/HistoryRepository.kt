@@ -1,6 +1,6 @@
 package com.dana.merchantapp.data.history
 
-import com.dana.merchantapp.presentation.model.Transaction
+import com.dana.merchantapp.data.model.Transaction
 
 interface HistoryRepository {
     fun getTransactionsFromFirestore(callback: (List<Transaction>?) -> Unit)

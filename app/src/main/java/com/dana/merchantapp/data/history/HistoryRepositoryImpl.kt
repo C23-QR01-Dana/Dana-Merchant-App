@@ -4,7 +4,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.auth.FirebaseAuth
 import java.text.SimpleDateFormat
 import java.util.Locale
-import com.dana.merchantapp.presentation.model.Transaction
+import com.dana.merchantapp.data.model.Transaction
 
 class HistoryRepositoryImpl: HistoryRepository {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
