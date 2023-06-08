@@ -33,7 +33,7 @@ import java.util.*
 
 @Composable
 fun HistoryScreen(historyViewModel: HistoryViewModel = hiltViewModel()) {
-    historyViewModel.getTransactionsFromFirestore()
+    historyViewModel.getTransactions()
     TransactionHistory(transactions = historyViewModel.transactions.value, historyViewModel = historyViewModel)
 }
 
@@ -48,7 +48,7 @@ fun TransactionHistory(transactions: List<Transaction>?, historyViewModel: Histo
 
     fun refresh() = refreshScope.launch {
         refreshing = true
-        historyViewModel.getTransactionsFromFirestore()
+        historyViewModel.getTransactions()
         refreshing = false
     }
 

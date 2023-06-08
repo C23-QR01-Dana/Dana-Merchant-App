@@ -1,9 +1,9 @@
-package com.dana.merchantapp.data.history
+package com.dana.merchantapp.domain.history
 
 import com.dana.merchantapp.data.model.Transaction
 
 interface HistoryRepository {
-    fun getTransactionsFromFirestore(callback: (List<Transaction>?) -> Unit)
+    fun getTransactions(callback: (List<Transaction>?) -> Unit)
 
     fun convertTimestampToDayMonthYear(timestamp: Long): String
 

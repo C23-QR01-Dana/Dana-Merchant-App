@@ -5,10 +5,11 @@ import com.google.firebase.auth.FirebaseAuth
 import java.text.SimpleDateFormat
 import java.util.Locale
 import com.dana.merchantapp.data.model.Transaction
+import com.dana.merchantapp.domain.history.HistoryRepository
+import javax.inject.Inject
 
-class HistoryRepositoryImpl: HistoryRepository {
-    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
-    private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
+class HistoryRepositoryImpl @Inject constructor (private val auth: FirebaseAuth, private val firestore: FirebaseFirestore):
+    HistoryRepository {
 
     override fun convertTimestampToDayMonthYear(timestamp: Long): String {
         val adjustedTimestamp = if (timestamp.toString().length <= 10) {
@@ -32,7 +33,7 @@ class HistoryRepositoryImpl: HistoryRepository {
         return dateFormat.format(adjustedTimestamp)
     }
 
-    override fun getTransactionsFromFirestore(callback: (List<Transaction>?) -> Unit) {
+    override fun getTransactions(callback: (List<Transaction>?) -> Unit) {
         val transactionsRef = firestore.collection("transaction")
         val transactions = mutableListOf<Transaction>()
 
