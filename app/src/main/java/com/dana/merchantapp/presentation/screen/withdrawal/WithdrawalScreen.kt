@@ -94,7 +94,7 @@ fun WithdrawalScreen(navController: NavController, withdrawalViewModel: Withdraw
                         onClick = {
                                   navController.navigate(Screen.BankSelect.route)
                         },
-                        shape = RoundedCornerShape(20.dp),
+                        shape = RoundedCornerShape(8.dp),
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(top = 8.dp)

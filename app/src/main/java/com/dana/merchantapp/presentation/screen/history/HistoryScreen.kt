@@ -8,6 +8,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.material.icons.Icons
@@ -23,6 +24,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.text.font.FontWeight
+import androidx.core.text.isDigitsOnly
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.dana.merchantapp.data.model.MerchantWithdrawTransaction
 import com.dana.merchantapp.data.model.PaymentTransaction
@@ -43,45 +48,276 @@ fun TransactionHistory(transactions: List<Transaction>?, historyViewModel: Histo
     val sortedTransactions = transactions?.sortedByDescending { it.timestamp }
     val transactionsByDate = sortedTransactions?.filter { it.timestamp != null }?.groupBy { historyViewModel.convertTimestampToDayMonthYear(it.timestamp!!) }
 
+    // Pull-to-refresh
     val refreshScope = rememberCoroutineScope()
     var refreshing by remember { mutableStateOf(false) }
-
     fun refresh() = refreshScope.launch {
         refreshing = true
         historyViewModel.getTransactions()
         refreshing = false
     }
-
     val state = rememberPullRefreshState(refreshing, ::refresh)
 
+    // Filter bottom sheet
+    val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
+    val scope = rememberCoroutineScope()
+
+    // Amount filter
+    val fromAmount = remember { mutableStateOf("") }
+    val fromAmountError = remember { mutableStateOf("") }
+    val toAmount = remember { mutableStateOf("") }
+    val toAmountError = remember { mutableStateOf("") }
+    val selectedTransactionType = remember { mutableStateOf("All") }
+    val isFilterApplied = remember { mutableStateOf(false) }
+
     MaterialTheme {
-        Box(Modifier.pullRefresh(state)) {
-            LazyColumn {
-                transactionsByDate?.forEach { (month, transactionsForMonth) ->
-                    item {
+        ModalBottomSheetLayout(
+            sheetState = sheetState,
+            sheetShape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
+            sheetElevation = 100.dp,
+            sheetContent = {
+                Column(Modifier.padding(16.dp)) {
+                    Box(
+                        Modifier
+                            .width(40.dp)
+                            .height(4.dp)
+                            .background(Color.Gray, RoundedCornerShape(2.dp))
+                            .align(Alignment.CenterHorizontally)
+                    )
+                    Text("Amount")
+                    Row(Modifier.padding(vertical = 8.dp)) {
+                        TextField(
+                            value = fromAmount.value,
+                            onValueChange = { newValue ->
+                                if (newValue.isNotEmpty() && newValue.isDigitsOnly() && newValue.toLong() <= 10000000000) {
+                                    fromAmount.value = newValue
+                                    fromAmountError.value = ""
+                                    // Check error for To amount
+                                    if (toAmount.value.isEmpty()) {
+                                        toAmountError.value = "Must be filled"
+                                    } else {
+                                        val toAmountValue = toAmount.value.toLong()
+                                        if (toAmountValue <= newValue.toLong()) {
+                                            toAmountError.value = "Amount must be greater"
+                                        } else {
+                                            toAmountError.value = ""
+                                        }
+                                    }
+                                } else if (newValue.isEmpty()) {
+                                    fromAmount.value = ""
+                                    toAmountError.value = ""
+                                    if (toAmount.value.isNotEmpty()) {
+                                        fromAmountError.value = "Must be filled"
+                                    }
+                                }
+                            },
+                            modifier = Modifier
+                                .weight(1f)
+                                .background(Color.White, RoundedCornerShape(4.dp)),
+                            placeholder = { Text("From") },
+                            colors = TextFieldDefaults.textFieldColors(
+                                backgroundColor = Color.White,
+                            ),
+                            isError = fromAmountError.value.isNotEmpty(),
+                            visualTransformation = ThousandSeparatorTransformation()
+
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        TextField(
+                            value = toAmount.value,
+                            onValueChange = { newValue ->
+                                if (newValue.isNotEmpty() && newValue.isDigitsOnly() && newValue.toLong() <= 10000000000) {
+                                    toAmount.value = newValue
+
+                                    if (fromAmount.value.isNotEmpty()) {
+                                        val fromAmountValue = fromAmount.value.toLong()
+                                        val toAmountValue = newValue.toLong()
+                                        if (toAmountValue <= fromAmountValue) {
+                                            toAmountError.value = "Amount must be greater"
+                                        } else {
+                                            toAmountError.value = ""
+                                        }
+                                    } else {
+                                        fromAmountError.value = "Must be filled"
+                                    }
+                                } else if (newValue.isEmpty()) {
+                                    toAmount.value = ""
+                                    fromAmountError.value = ""
+                                    if (fromAmount.value.isNotEmpty()) {
+                                        toAmountError.value = "Must be filled"
+                                    }
+                                }
+                            },
+                            modifier = Modifier
+                                .weight(1f)
+                                .background(Color.White, RoundedCornerShape(4.dp)),
+                            placeholder = { Text("To") },
+                            colors = TextFieldDefaults.textFieldColors(
+                                backgroundColor = Color.White,
+                            ),
+                            isError = toAmountError.value.isNotEmpty(),
+                            visualTransformation = ThousandSeparatorTransformation()
+                        )
+                    }
+                    Text("Type", modifier = Modifier.padding(top = 16.dp))
+                    Row(Modifier.padding(vertical = 8.dp)) {
+                        RadioButton(
+                            selected = selectedTransactionType.value == "All",
+                            onClick = { selectedTransactionType.value = "All" }
+                        )
                         Text(
-                            text = month,
-                            modifier = Modifier.padding(16.dp),
-                            style = MaterialTheme.typography.h6
+                            "All",
+                            modifier = Modifier.padding(start = 8.dp)
+                                .align(Alignment.CenterVertically)
+                        )
+
+                        Spacer(Modifier.width(16.dp))
+
+                        RadioButton(
+                            selected = selectedTransactionType.value == "Incoming",
+                            onClick = { selectedTransactionType.value = "Incoming" }
+                        )
+                        Text(
+                            "Incoming",
+                            modifier = Modifier.padding(start = 8.dp)
+                                .align(Alignment.CenterVertically)
+                        )
+
+                        Spacer(Modifier.width(16.dp))
+
+                        RadioButton(
+                            selected = selectedTransactionType.value == "Outgoing",
+                            onClick = { selectedTransactionType.value = "Outgoing" }
+                        )
+                        Text(
+                            "Outgoing",
+                            modifier = Modifier.padding(start = 8.dp)
+                                .align(Alignment.CenterVertically)
                         )
                     }
-                    items(transactionsForMonth.size) { index ->
-                        val transaction = transactionsForMonth[index]
-                        TransactionItem(
-                            transaction = transaction,
-                            historyViewModel = historyViewModel
-                        )
+                    Button(
+                        shape = RoundedCornerShape(8.dp),
+                        onClick = {
+                            // Apply filters
+                            scope.launch {
+                                sheetState.hide()
+                                if (fromAmount.value.isEmpty() && toAmount.value.isEmpty()) {
+                                    historyViewModel.minAmount.value = 0L
+                                    historyViewModel.maxAmount.value = Long.MAX_VALUE
+                                } else {
+                                    historyViewModel.minAmount.value = fromAmount.value.toLong()
+                                    historyViewModel.maxAmount.value = toAmount.value.toLong()
+                                }
+                                historyViewModel.transactionType.value =
+                                    selectedTransactionType.value
+                                historyViewModel.getTransactions()
+                                isFilterApplied.value = true
+                            }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(),
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = BluePrimary,
+                        ),
+                        enabled = fromAmountError.value.isEmpty() && toAmountError.value.isEmpty()
+                    ) {
+                        Text("APPLY")
                     }
-                    item {
-                        Divider(
-                            modifier = Modifier.padding(horizontal = 16.dp),
-                            color = Color.LightGray
+                    Button(
+                        shape = RoundedCornerShape(8.dp),
+                        onClick = {
+                            // Reset filters
+                            scope.launch {
+                                sheetState.hide()
+                                fromAmount.value = ""
+                                toAmount.value = ""
+                                fromAmountError.value = ""
+                                toAmountError.value = ""
+                                selectedTransactionType.value = "All"
+                                historyViewModel.minAmount.value = 0L
+                                historyViewModel.maxAmount.value = Long.MAX_VALUE
+                                historyViewModel.transactionType.value = "All"
+                                historyViewModel.getTransactions()
+                                isFilterApplied.value = false
+                            }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            ,
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = Color(0xFFFFFFFF),
                         )
+                    ) {
+                        Text(text = "RESET FILTER", color = BluePrimary)
+                    }
+                    Box(Modifier.padding(bottom = 10.dp))
+                }
+            },
+            content = {
+                Column {
+                    TopAppBar(
+                        backgroundColor = BluePrimary,
+                        title = {
+                            Text(
+                                text = "Transaction History",
+                                style = MaterialTheme.typography.h6,
+                                fontWeight = FontWeight.Bold
+                            )
+                        },
+                        modifier = Modifier
+                            .background(
+                                brush = Brush.linearGradient(
+                                    colors = listOf(Color(0xFF86B0FF), Color(0xFF408CE2)),
+                                    start = Offset.Zero,
+                                    end = Offset.Infinite
+                                )
+                            ),
+                        actions = {
+                            IconButton(onClick = { scope.launch { sheetState.show() } }) {
+                                Icon(Icons.Filled.FilterList, contentDescription = "Filter")
+                                if (isFilterApplied.value) {
+                                    Box(
+                                        Modifier
+                                            .padding(start = 20.dp, bottom = 20.dp)
+                                            .size(12.dp)
+                                            .background(Color(0xFFE53935), RoundedCornerShape(50))
+                                    )
+                                }
+                            }
+                        }
+                    )
+
+                    Box(Modifier.pullRefresh(state)) {
+                        LazyColumn {
+                            transactionsByDate?.forEach { (month, transactionsForMonth) ->
+                                item {
+                                    Text(
+                                        text = month,
+                                        modifier = Modifier.padding(16.dp),
+                                        style = MaterialTheme.typography.h6
+                                    )
+                                }
+                                items(transactionsForMonth.size) { index ->
+                                    val transaction = transactionsForMonth[index]
+                                    TransactionItem(
+                                        transaction = transaction,
+                                        historyViewModel = historyViewModel
+                                    )
+                                }
+                                item {
+                                    Divider(
+                                        modifier = Modifier.padding(horizontal = 16.dp),
+                                        color = Color.LightGray
+                                    )
+                                }
+                            }
+                        }
+                        PullRefreshIndicator(refreshing, state, Modifier.align(Alignment.TopCenter))
                     }
                 }
             }
-            PullRefreshIndicator(refreshing, state, Modifier.align(Alignment.TopCenter))
-        }
+        )
     }
 }
 
@@ -131,7 +367,7 @@ fun TransactionItem(transaction: Transaction, historyViewModel: HistoryViewModel
             ) {
                 Icon(
                     imageVector = transactionIcon,
-                    contentDescription = "Incoming Payment",
+                    contentDescription = "Payment Group",
                     tint = Color.White,
                     modifier = Modifier
                         .align(Alignment.Center)
@@ -148,7 +384,7 @@ fun TransactionItem(transaction: Transaction, historyViewModel: HistoryViewModel
             ) {
                 Icon(
                     imageVector = transactionSecondIcon,
-                    contentDescription = "Incoming Payment",
+                    contentDescription = "Incoming/Outgoing Payment",
                     tint = Color.White,
                     modifier = Modifier
                         .align(Alignment.Center)
@@ -193,4 +429,28 @@ fun TransactionItem(transaction: Transaction, historyViewModel: HistoryViewModel
         }
     }
 }
+
+
+//class ThousandSeparatorTransformation : VisualTransformation {
+//    override fun filter(text: AnnotatedString): TransformedText {
+//        val formatted = formatNumber(text.text)
+//        val offsetTranslator = object : OffsetMapping {
+//            override fun originalToTransformed(offset: Int): Int {
+//                val commas = formatted.count { it == ',' }
+//                return offset + commas
+//            }
+//            override fun transformedToOriginal(offset: Int): Int {
+//                val commas = formatted.count { it == ',' }
+//                return offset - commas
+//            }
+//        }
+//        return TransformedText(AnnotatedString(formatted), offsetTranslator)
+//    }
+//
+//    private fun formatNumber(input: String): String {
+//        val number = input.toLongOrNull() ?: return input
+//        val amountFormatter = java.text.NumberFormat.getNumberInstance(Locale.US)
+//        return amountFormatter.format(number)
+//    }
+//}
 

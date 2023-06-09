@@ -10,10 +10,12 @@ import com.dana.merchantapp.domain.qr.QRRepository
 import com.dana.merchantapp.data.qr.QRRepositoryImpl
 import com.dana.merchantapp.domain.register.RegisterRepository
 import com.dana.merchantapp.data.register.RegisterRepositoryImpl
+import com.dana.merchantapp.data.splash.SplashRepositoryImpl
 import com.dana.merchantapp.data.withdraw.WithdrawRepositoryImpl
 import com.dana.merchantapp.domain.history.HistoryRepository
 import com.dana.merchantapp.domain.home.HomeRepository
 import com.dana.merchantapp.domain.login.LoginRepository
+import com.dana.merchantapp.domain.splash.SplashRepository
 import com.dana.merchantapp.domain.withdraw.WithdrawRepository
 import dagger.Binds
 import dagger.Module
@@ -44,6 +46,7 @@ abstract class RepositoryModule {
     @Binds
     abstract fun provideWithdrawRepository(withdrawRepositoryImpl: WithdrawRepositoryImpl): WithdrawRepository
 
-
+    @Binds
+    abstract fun providesplashRepository(splashRepositoryImpl: SplashRepositoryImpl): SplashRepository
 }
 

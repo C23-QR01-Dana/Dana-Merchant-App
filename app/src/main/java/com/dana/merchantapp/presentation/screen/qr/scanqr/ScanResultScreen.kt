@@ -2,21 +2,19 @@ package com.dana.merchantapp.presentation.screen.qr.scanqr
 
 
 
-import android.content.Intent
-import android.util.Log
+
 import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoneyOff
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ShoppingCartCheckout
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -28,11 +26,9 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
-import com.dana.merchantapp.presentation.main.MainActivity
 import com.dana.merchantapp.presentation.ui.component.navigation.Screen
 import com.dana.merchantapp.presentation.ui.theme.BluePrimary
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
+
 
 
 @Composable
@@ -59,16 +55,34 @@ fun ScanResultScreen(scanResultViewModel: ScanResultViewModel = hiltViewModel(),
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(bottom = 16.dp)
+            ,
         verticalArrangement = Arrangement.SpaceBetween
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
+
             ,
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            TopAppBar(
+                title = { Text("Scan QR") },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(Icons.Filled.ArrowBack, contentDescription = null)
+                    }
+                },
+                modifier = Modifier
+                    .background(
+                        brush = Brush.linearGradient(
+                            colors = listOf(Color(0xFF86B0FF), Color(0xFF408CE2)),
+                            start = Offset.Zero,
+                            end = Offset.Infinite
+                        )
+                    )
+            )
             Text(
                 text = "Transaksi",
                 style = TextStyle(
@@ -76,7 +90,7 @@ fun ScanResultScreen(scanResultViewModel: ScanResultViewModel = hiltViewModel(),
                     fontSize = 24.sp,
                     textAlign = TextAlign.Center
                 ),
-                modifier = Modifier.padding(bottom = 8.dp)
+                modifier = Modifier.padding(top=16.dp,bottom = 8.dp)
             )
             Text(
                 text = userId,
@@ -91,6 +105,7 @@ fun ScanResultScreen(scanResultViewModel: ScanResultViewModel = hiltViewModel(),
         Column(
             modifier = Modifier
                 .fillMaxWidth()
+                .padding(16.dp)
             ,
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
@@ -152,26 +167,7 @@ fun ScanResultScreen(scanResultViewModel: ScanResultViewModel = hiltViewModel(),
 
     }
 
-//    Column() {
-//
-//        Button(
-//            onClick = {
-//                navController.navigate(Screen.History.route){
-//                    popUpTo(navController.graph.findStartDestination().id) {
-//                        saveState = true
-//                    }
-//                    launchSingleTop = true
-//                }
-//            },
-//            shape = RoundedCornerShape(20.dp),
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .padding(horizontal = 16.dp)
-//
-//        ) {
-//            Text(text = "Generate QR")
-//        }
-//    }
+
 
 
 }

@@ -1,15 +1,11 @@
 package com.dana.merchantapp.presentation.landing
 
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -27,19 +23,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.dana.merchantapp.R
 import com.dana.merchantapp.presentation.login.LoginActivity
-import com.dana.merchantapp.presentation.main.MainActivity
 import com.dana.merchantapp.presentation.register.RegisterActivity
 import com.dana.merchantapp.presentation.ui.theme.BluePrimary
 import com.dana.merchantapp.presentation.ui.theme.MerchantAppTheme
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 
 class LandingActivity : ComponentActivity() {
-    private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        auth = Firebase.auth
         super.onCreate(savedInstanceState)
 
         setContent {
@@ -53,39 +43,6 @@ class LandingActivity : ComponentActivity() {
             }
         }
     }
-
-    override fun onStart() {
-        super.onStart()
-//        createNotificationChannel()
-        val currentUser = auth.currentUser
-        if (currentUser != null) {
-            val intent = Intent(this, MainActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
-            startActivity(intent)
-        }
-    }
-
-//    private fun createNotificationChannel() {
-//        // If the Android Version is greater than Oreo,
-//        // then create the NotificationChannel
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//            val name = "PAYMENT"
-//            val descriptionText = "Notification for incoming payment"
-//
-//            val channel = NotificationChannel(
-//                "PAYMENT_1",
-//                name,
-//                NotificationManager.IMPORTANCE_DEFAULT
-//            ).apply {
-//                description = descriptionText
-//            }
-//
-//            // Register the channel
-//            val notificationManager: NotificationManager =
-//                getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-//            notificationManager.createNotificationChannel(channel)
-//        }
-//    }
 }
 
 

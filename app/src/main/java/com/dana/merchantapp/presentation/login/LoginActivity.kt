@@ -6,12 +6,8 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -40,14 +36,17 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.dana.merchantapp.R
 import com.dana.merchantapp.presentation.main.MainActivity
+import com.dana.merchantapp.presentation.register.RegisterActivity
 import com.dana.merchantapp.presentation.ui.component.CustomTextField
 import com.dana.merchantapp.presentation.ui.theme.BluePrimary
 import com.dana.merchantapp.presentation.ui.theme.MerchantAppTheme
@@ -156,6 +155,19 @@ fun LoginScreen(loginViewModel: LoginViewModel = hiltViewModel()) {
                     .shadow(8.dp, shape = RoundedCornerShape(20.dp))
             ) {
                 Text(text = "Login")
+            }
+            Row(){
+                Text(
+                    text = "Does not have an account? ",
+                    style = TextStyle(color= BluePrimary)
+                )
+
+                Text(
+                    text = "Register",
+                    style = TextStyle(color= BluePrimary, textDecoration = TextDecoration.Underline),
+                    modifier = Modifier.clickable(onClick = {context.startActivity(Intent(context,RegisterActivity::class.java)) })
+
+                )
             }
         }
     }

@@ -54,4 +54,36 @@ class HistoryRepositoryImpl @Inject constructor (private val auth: FirebaseAuth,
             }
     }
 
+    override fun applyFilters(fetchedTransactions: List<Transaction>, minAmount: Long, maxAmount: Long, startDate: Long, endDate: Long, transactionType: String): List<Transaction> {
+        val filteredTransactions = fetchedTransactions.filter { transaction ->
+            val amount = transaction.amount ?: 0
+            val timestamp = transaction.timestamp
+            val type = transaction.trxType
+
+            val isAmountInRange = amount in minAmount..maxAmount
+
+            // Check if timestamp is in seconds or milliseconds and convert to milliseconds if needed
+            val timestampMillis = if (timestamp != null && timestamp.toString().length == 10) {
+                timestamp * 1000
+            } else {
+                timestamp
+            }
+
+            val isTimestampInRange = if (startDate != 0L && endDate != Long.MAX_VALUE) {
+                timestampMillis != null && timestampMillis >= startDate && timestampMillis <= endDate
+            } else {
+                true
+            }
+
+            val isTypeMatched = when (transactionType) {
+                "Incoming" -> type == "PAYMENT"
+                "Outgoing" -> type == "MERCHANT_WITHDRAW"
+                else -> true
+            }
+
+            isAmountInRange && isTimestampInRange && isTypeMatched
+        }
+        return filteredTransactions
+    }
+
 }

@@ -103,7 +103,7 @@ fun Main(navController: NavHostController = rememberNavController()) {
                 FloatingActionButton(
                     onClick = {
                         val item = BottomNavItem("QR", Icons.Default.QrCode, Screen.QR)
-                        navController.navigate(item.screen.route)
+                        navController.navigate(Screen.QR.createRoute(0))
                     },
                     backgroundColor = BlueButton
 
@@ -122,10 +122,20 @@ fun Main(navController: NavHostController = rememberNavController()) {
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(Screen.Home.route) {
-                HomeScreen()
+                HomeScreen(navController)
             }
-            composable(Screen.QR.route) {
-                QrScreen(navController)
+
+            composable(
+                route = Screen.QR.route,
+                arguments = listOf(
+                    navArgument("tabIndex") { type = NavType.IntType }
+                )
+            ) {
+                val id = it.arguments?.getInt("tabIndex") ?: 0
+                QrScreen(
+                    navController = navController,
+                    initialTabIndex = id,
+                )
             }
             composable(
                 route = Screen.ScanCamera.route,
