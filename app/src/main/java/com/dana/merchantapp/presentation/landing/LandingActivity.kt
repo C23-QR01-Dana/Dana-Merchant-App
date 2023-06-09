@@ -1,7 +1,10 @@
 package com.dana.merchantapp.presentation.landing
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -53,6 +56,7 @@ class LandingActivity : ComponentActivity() {
 
     override fun onStart() {
         super.onStart()
+//        createNotificationChannel()
         val currentUser = auth.currentUser
         if (currentUser != null) {
             val intent = Intent(this, MainActivity::class.java)
@@ -60,6 +64,28 @@ class LandingActivity : ComponentActivity() {
             startActivity(intent)
         }
     }
+
+//    private fun createNotificationChannel() {
+//        // If the Android Version is greater than Oreo,
+//        // then create the NotificationChannel
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//            val name = "PAYMENT"
+//            val descriptionText = "Notification for incoming payment"
+//
+//            val channel = NotificationChannel(
+//                "PAYMENT_1",
+//                name,
+//                NotificationManager.IMPORTANCE_DEFAULT
+//            ).apply {
+//                description = descriptionText
+//            }
+//
+//            // Register the channel
+//            val notificationManager: NotificationManager =
+//                getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+//            notificationManager.createNotificationChannel(channel)
+//        }
+//    }
 }
 
 
