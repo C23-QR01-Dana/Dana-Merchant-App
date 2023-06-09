@@ -1,7 +1,7 @@
 package com.dana.merchantapp.data.model
 
 open class Transaction(
-    open val amount: Int?,
+    open val amount: Long?,
     open val id: String?,
     open val merchantId: String?,
     open val timestamp: Long?,
@@ -9,7 +9,7 @@ open class Transaction(
 )
 
 data class PaymentTransaction(
-    override val amount: Int?,
+    override val amount: Long?,
     override val id: String?,
     override val merchantId: String?,
     override val timestamp: Long?,
@@ -18,7 +18,7 @@ data class PaymentTransaction(
 ) : Transaction(amount, id, merchantId, timestamp, trxType)
 
 data class MerchantWithdrawTransaction(
-    override val amount: Int?,
+    override val amount: Long?,
     override val id: String?,
     override val merchantId: String?,
     override val timestamp: Long?,

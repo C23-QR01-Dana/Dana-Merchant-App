@@ -2,6 +2,7 @@ package com.dana.merchantapp.presentation.screen.history
 
 import android.icu.text.NumberFormat
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -29,6 +30,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
 import androidx.core.text.isDigitsOnly
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.dana.merchantapp.data.model.MerchantWithdrawTransaction
 import com.dana.merchantapp.data.model.PaymentTransaction
 import com.dana.merchantapp.data.model.Transaction
@@ -37,14 +39,14 @@ import kotlinx.coroutines.launch
 import java.util.*
 
 @Composable
-fun HistoryScreen(historyViewModel: HistoryViewModel = hiltViewModel()) {
+fun HistoryScreen(navController: NavController, historyViewModel: HistoryViewModel = hiltViewModel()) {
     historyViewModel.getTransactions()
-    TransactionHistory(transactions = historyViewModel.transactions.value, historyViewModel = historyViewModel)
+    TransactionHistory(navController = navController, transactions = historyViewModel.transactions.value)
 }
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun TransactionHistory(transactions: List<Transaction>?, historyViewModel: HistoryViewModel = hiltViewModel()) {
+fun TransactionHistory(navController: NavController, transactions: List<Transaction>?, historyViewModel: HistoryViewModel = hiltViewModel()) {
     val sortedTransactions = transactions?.sortedByDescending { it.timestamp }
     val transactionsByDate = sortedTransactions?.filter { it.timestamp != null }?.groupBy { historyViewModel.convertTimestampToDayMonthYear(it.timestamp!!) }
 
@@ -301,8 +303,8 @@ fun TransactionHistory(transactions: List<Transaction>?, historyViewModel: Histo
                                 items(transactionsForMonth.size) { index ->
                                     val transaction = transactionsForMonth[index]
                                     TransactionItem(
-                                        transaction = transaction,
-                                        historyViewModel = historyViewModel
+                                        navController = navController,
+                                        transaction = transaction
                                     )
                                 }
                                 item {
@@ -322,36 +324,54 @@ fun TransactionHistory(transactions: List<Transaction>?, historyViewModel: Histo
 }
 
 @Composable
-fun TransactionItem(transaction: Transaction, historyViewModel: HistoryViewModel = hiltViewModel()) {
-    var transactionTitle = "N/A"
-    var transactionType = "N/A"
+fun TransactionItem(
+    navController: NavController,
+    transaction: Transaction,
+    historyViewModel: HistoryViewModel = hiltViewModel()
+) {
+    val transaction = transaction
     var transactionAmount = "0"
+    val transactionId = transaction.id ?: "0"
+    val merchantId = transaction.merchantId ?: "0"
+    val transactionDate = transaction.timestamp?.let { historyViewModel.convertTimestampToDayMonthYear(it) } ?: "N/A"
+    val transactionTime = transaction.timestamp?.let { historyViewModel.convertTimestampToHourMinute(it) } ?: "N/A"
+    var transactionType = "N/A"
+
+    var transactionTitle = "N/A"
     var transactionIcon = Icons.Default.QuestionMark
     var transactionSecondIcon = Icons.Default.QuestionMark
     var transactionSecondIconBackgroundColor = Color(0x00000000)
+    var transactionPartyId = ""
     val amountFormatter = NumberFormat.getNumberInstance(Locale.US)
 
     if (transaction is PaymentTransaction) {
-        transactionTitle = "Customer Payment"
-        transactionType = "Incoming"
         transactionAmount = "+ IDR ${amountFormatter.format(transaction.amount ?: 0)}"
+        transactionType = "Incoming"
+        transactionTitle = "Customer Payment"
         transactionIcon = Icons.Default.Group
         transactionSecondIcon = Icons.Default.SouthWest
         transactionSecondIconBackgroundColor = Color(0xFF00C853)
+        transactionPartyId = transaction.payerId ?: "0"
     } else if (transaction is MerchantWithdrawTransaction) {
-        transactionTitle = "Withdraw to ${transaction.bankInst}"
-        transactionType = "Outgoing"
         transactionAmount = "IDR ${amountFormatter.format(transaction.amount ?: 0)}"
+        transactionType = "Outgoing"
+        transactionTitle = "Withdraw to ${transaction.bankInst}"
         transactionIcon = Icons.Default.AccountBalance
         transactionSecondIcon = Icons.Default.NorthEast
         transactionSecondIconBackgroundColor = Color(0xFFE53935)
+        transactionPartyId = transaction.bankAccountNo ?: "0"
     }
 
     Row(
         modifier = Modifier
             .padding(16.dp)
             .wrapContentHeight()
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .clickable {
+                navController.navigate(
+                    "transactionItemDetails/${transactionTitle}/${transactionAmount}/${transactionId}/${merchantId}/${transactionDate + " • " + transactionTime}/${transactionType}/${transactionPartyId}"
+                )
+            },
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
@@ -404,7 +424,7 @@ fun TransactionItem(transaction: Transaction, historyViewModel: HistoryViewModel
                 overflow = TextOverflow.Ellipsis
             )
             Text(
-                text = transaction.timestamp?.let { historyViewModel.convertTimestampToHourMinute(it) } ?: "N/A",
+                text = transactionTime,
                 style = MaterialTheme.typography.caption,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis

@@ -21,6 +21,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.dana.merchantapp.presentation.screen.history.HistoryScreen
+import com.dana.merchantapp.presentation.screen.history.TransactionItemDetailsScreen
 import com.dana.merchantapp.presentation.screen.home.HomeScreen
 import com.dana.merchantapp.presentation.screen.profile.ProfileScreen
 import com.dana.merchantapp.presentation.screen.qr.QrScreen
@@ -137,7 +138,7 @@ fun Main(navController: NavHostController = rememberNavController()) {
                 WithdrawalScreen(navController)
             }
             composable(Screen.History.route) {
-                HistoryScreen()
+                HistoryScreen(navController)
             }
             composable(Screen.Profile.route) {
                 ProfileScreen(navController)
@@ -158,6 +159,29 @@ fun Main(navController: NavHostController = rememberNavController()) {
                 val bankAccountNo = it.arguments?.getString("bankAccountNo") ?: ""
                 val bankInst = it.arguments?.getString("bankInst") ?: ""
                 WithdrawAmountScreen(navController, bankAccountNo, bankInst)
+            }
+            composable(
+                route = Screen.TransactionItemDetails.route,
+                arguments = listOf(
+                    navArgument("transactionTitle") { type = NavType.StringType },
+                    navArgument("transactionAmount") { type = NavType.StringType },
+                    navArgument("transactionId") { type = NavType.StringType },
+                    navArgument("merchantId") { type = NavType.StringType },
+                    navArgument("transactionTimestamp") { type = NavType.StringType },
+                    navArgument("transactionType") { type = NavType.StringType },
+                    navArgument("transactionPartyId") { type = NavType.StringType },
+                )
+            ) {
+                val transactionTitle = it.arguments?.getString("transactionTitle") ?: ""
+                val transactionAmount = it.arguments?.getString("transactionAmount") ?: ""
+                val transactionId = it.arguments?.getString("transactionId") ?: ""
+                val merchantId = it.arguments?.getString("merchantId") ?: ""
+                val transactionTimestamp = it.arguments?.getString("transactionTimestamp") ?: ""
+                val transactionType = it.arguments?.getString("transactionType") ?: ""
+                val transactionPartyId = it.arguments?.getString("transactionPartyId") ?: ""
+                TransactionItemDetailsScreen(
+                    navController, transactionTitle, transactionAmount, transactionId, merchantId, transactionTimestamp, transactionType, transactionPartyId
+                )
             }
         }
         // Content area
