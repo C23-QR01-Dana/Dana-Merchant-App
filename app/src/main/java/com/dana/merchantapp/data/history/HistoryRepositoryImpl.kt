@@ -1,5 +1,7 @@
 package com.dana.merchantapp.data.history
 
+import com.dana.merchantapp.data.model.MerchantWithdrawTransaction
+import com.dana.merchantapp.data.model.PaymentTransaction
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.auth.FirebaseAuth
 import java.text.SimpleDateFormat
@@ -84,6 +86,24 @@ class HistoryRepositoryImpl @Inject constructor (private val auth: FirebaseAuth,
             isAmountInRange && isTimestampInRange && isTypeMatched
         }
         return filteredTransactions
+    }
+
+    override fun getIncomeOutcome(fetchedTransations: List<Transaction>): HashMap<String, String> {
+        val sortedTransactions = fetchedTransations.sortedByDescending { it.timestamp }
+        var income = 0L
+        var outcome = 0L
+
+        for (transaction in sortedTransactions) {
+            when (transaction) {
+                is PaymentTransaction -> income += transaction.amount ?: 0
+                is MerchantWithdrawTransaction -> outcome += transaction.amount ?: 0
+            }
+        }
+
+        return hashMapOf(
+            "income" to income.toString(),
+            "outcome" to outcome.toString()
+        )
     }
 
 }

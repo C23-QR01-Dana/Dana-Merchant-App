@@ -9,7 +9,7 @@ object TransactionMapper {
     fun mapToTransaction(documentSnapshot: DocumentSnapshot): Transaction? {
         return if (documentSnapshot.exists()) {
             val amount = documentSnapshot.getLong("amount") ?: 0L
-            val id = documentSnapshot.getString("id") ?: ""
+            val id = documentSnapshot.id
             val merchantId = documentSnapshot.getString("merchantId") ?: ""
             val timestamp = documentSnapshot.getLong("timestamp") ?: 0.toLong()
             val trxType = documentSnapshot.getString("trxType") ?: ""

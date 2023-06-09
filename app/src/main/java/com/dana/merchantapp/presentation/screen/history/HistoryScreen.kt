@@ -262,7 +262,7 @@ fun TransactionHistory(navController: NavController, transactions: List<Transact
                         backgroundColor = BluePrimary,
                         title = {
                             Text(
-                                text = "Transaction History",
+                                text = "Transaction History" + historyViewModel.recentIncome.value + " " + historyViewModel.recentOutcome.value,
                                 style = MaterialTheme.typography.h6,
                                 fontWeight = FontWeight.Bold
                             )
@@ -331,7 +331,10 @@ fun TransactionItem(
 ) {
     val transaction = transaction
     var transactionAmount = "0"
-    val transactionId = transaction.id ?: "0"
+    var transactionId = transaction.id ?: "0"
+    if (transactionId == "") {
+        transactionId = "Not available"
+    }
     val merchantId = transaction.merchantId ?: "0"
     val transactionDate = transaction.timestamp?.let { historyViewModel.convertTimestampToDayMonthYear(it) } ?: "N/A"
     val transactionTime = transaction.timestamp?.let { historyViewModel.convertTimestampToHourMinute(it) } ?: "N/A"
@@ -369,7 +372,7 @@ fun TransactionItem(
             .fillMaxWidth()
             .clickable {
                 navController.navigate(
-                    "transactionItemDetails/${transactionTitle}/${transactionAmount}/${transactionId}/${merchantId}/${transactionDate + " • " + transactionTime}/${transactionType}/${transactionPartyId}"
+                    "transactionItemDetails/${transactionTitle}/${transactionAmount}/${transactionId}/${merchantId}/${"$transactionDate • $transactionTime"}/${transactionType}/${transactionPartyId}"
                 )
             },
         verticalAlignment = Alignment.CenterVertically
