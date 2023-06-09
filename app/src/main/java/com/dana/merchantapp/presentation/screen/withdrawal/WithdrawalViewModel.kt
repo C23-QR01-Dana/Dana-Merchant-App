@@ -4,8 +4,14 @@ import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.dana.merchantapp.data.model.BankAccount
 import com.dana.merchantapp.data.model.Merchant
+import com.dana.merchantapp.data.model.Transaction
+import com.dana.merchantapp.domain.history.ApplyFilters
+import com.dana.merchantapp.domain.history.ConvertTimestampToDayMonthYear
+import com.dana.merchantapp.domain.history.ConvertTimestampToHourMinute
+import com.dana.merchantapp.domain.history.GetTransactions
 import com.dana.merchantapp.domain.home.GetMerchant
 import com.dana.merchantapp.domain.profile.LogoutUser
 import com.dana.merchantapp.domain.profile.UpdatePhoto
@@ -15,6 +21,7 @@ import com.dana.merchantapp.domain.withdraw.ValidateBank
 import com.dana.merchantapp.domain.withdraw.Withdraw
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -24,6 +31,10 @@ class WithdrawalViewModel @Inject constructor(
     private val validateBank: ValidateBank,
     private val addBank: AddBank,
     private val withdraw: Withdraw,
+    private val getTransactions: GetTransactions,
+    private val applyFilters: ApplyFilters,
+    private val convertTimestampToHourMinute: ConvertTimestampToHourMinute,
+    private val convertTimestampToDayMonthYear: ConvertTimestampToDayMonthYear
     ) : ViewModel() {
 
     private val _merchant = mutableStateOf<Merchant?>(null)
@@ -46,6 +57,9 @@ class WithdrawalViewModel @Inject constructor(
 
     private val _isWithdrawSuccess = MutableStateFlow(false)
     val isWithdrawSuccess: MutableStateFlow<Boolean> get() = _isWithdrawSuccess
+
+    private val _transactions = mutableStateOf<List<Transaction>?>(null)
+    val transactions: State<List<Transaction>?> get() = _transactions
 
     fun getMerchant() {
         getMerchant.getMerchant { merchant ->
@@ -86,6 +100,26 @@ class WithdrawalViewModel @Inject constructor(
         withdraw.withdraw(amount, timestamp, bankAccount) { isSuccess ->
             _isWithdrawSuccess.value = isSuccess
         }
+    }
+
+    fun getTransactions() {
+        viewModelScope.launch {
+            getTransactions.getTransactions { transactions ->
+                if (transactions != null) {
+                    _transactions.value = applyFilters.applyFilters(transactions, 0L, Long.MAX_VALUE, 0L, Long.MAX_VALUE, "Outgoing")
+                } else {
+                    _transactions.value = null
+                }
+            }
+        }
+    }
+
+    fun convertTimestampToDayMonthYear(timestamp: Long): String {
+        return convertTimestampToDayMonthYear.convertTimestampToDayMonthYear(timestamp)
+    }
+
+    fun convertTimestampToHourMinute(timestamp: Long): String {
+        return convertTimestampToHourMinute.convertTimestampToHourMinute(timestamp)
     }
 
     fun makeInvalid() {
