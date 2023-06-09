@@ -14,10 +14,9 @@ import com.dana.merchantapp.presentation.ui.component.CustomTabLayout
 
 
 @Composable
-fun QrScreen(navController: NavController) {
-
+fun QrScreen(navController: NavController, initialTabIndex: Int) {
     val tabs = listOf("Static QR", "Scan QR", "Dynamic QR")
-    var selectedTabIndex by remember { mutableStateOf(0) }
+    val selectedTabIndex = remember { mutableStateOf(initialTabIndex)}
 
     Column(
         modifier = Modifier
@@ -25,11 +24,11 @@ fun QrScreen(navController: NavController) {
     ) {
         CustomTabLayout(
             tabs = tabs,
-            selectedTabIndex = selectedTabIndex,
-            onTabSelected = { index -> selectedTabIndex = index }
+            selectedTabIndex = selectedTabIndex.value,
+            onTabSelected = { index -> selectedTabIndex.value = index }
         )
 
-        when (selectedTabIndex) {
+        when (selectedTabIndex.value) {
             0 -> StaticQrScreen()
             1 -> ScanQrScreen(navController)
             2 -> DynamicQrScreen()
