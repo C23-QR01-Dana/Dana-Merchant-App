@@ -22,4 +22,10 @@ sealed class Screen(val route: String) {
         fun createRoute(bankAccountNo: String, bankInst: String) = "withdrawAmount/$bankAccountNo/$bankInst"
     }
 
+    object TransactionItemDetails : Screen("transactionItemDetails/{transactionTitle}/{transactionAmount}/{transactionId}/{merchantId}/{transactionTimestamp}/{transactionType}/{transactionPartyId}") {
+        fun createRoute(
+            transactionTitle: String, transactionAmount: String, transactionId: String, merchantId: String, transactionTimestamp: String, transactionType: String, transactionPartyId: String
+        )
+        = "transactionItemDetails/$transactionTitle/$transactionAmount/$transactionId/$merchantId/$transactionTimestamp/$transactionType/$transactionPartyId"
+    }
 }
