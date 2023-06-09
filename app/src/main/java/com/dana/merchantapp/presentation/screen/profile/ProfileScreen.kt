@@ -104,84 +104,113 @@ fun ProfileScreen(navController: NavController, profileViewModel: ProfileViewMod
             .fillMaxSize(),
         verticalArrangement = Arrangement.Top,
     ) {
-        TopAppBar(
-            title = { Text("Profile") },
-
+//        TopAppBar(
+//            title = { Text("Profile") },
+//
+//            modifier = Modifier
+//                .background(
+//                    brush = Brush.linearGradient(
+//                        colors = listOf(Color(0xFF86B0FF), Color(0xFF408CE2)),
+//                        start = Offset.Zero,
+//                        end = Offset.Infinite
+//                    )
+//                )
+//        )
+        Card(
+            shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp),
             modifier = Modifier
-                .background(
-                    brush = Brush.linearGradient(
-                        colors = listOf(Color(0xFF86B0FF), Color(0xFF408CE2)),
-                        start = Offset.Zero,
-                        end = Offset.Infinite
-                    )
-                )
-        )
-        Row(
-            modifier = Modifier
-                .padding(16.dp),
+                .fillMaxWidth()
+                .height(180.dp)
+                .padding(0.dp),
         ) {
-            Box(modifier = Modifier.size(110.dp)) {
-                Image(
-                    painter = rememberImagePainter(
-                        data = profileViewModel.merchant.value?.merchantLogo ?: ""
-                    ),
-                    contentDescription = "avatar",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .size(100.dp)
-                        .clip(CircleShape)
-                )
-                Box(
-                    modifier = Modifier
-                        .size(48.dp)
-                        .align(Alignment.BottomEnd)
-                        .padding(8.dp)
-                        .clip(CircleShape)
-                        .background(BluePrimary)
-                        .clickable {
-                            launcher.launch(
-                                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-                            )
-                        },
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.AddAPhoto,
-                        contentDescription = "Change Photo",
-                        tint = Color.White,
-                        modifier = Modifier
-                            .align(Alignment.Center)
-                            .size(16.dp)
-                    )
-                }
-            }
-            Column(
+            Box(
                 modifier = Modifier
-                    .padding(start = 16.dp)
-                    .align(Alignment.CenterVertically)
+                    .background(
+                        brush = Brush.linearGradient(
+                            colors = listOf(Color(0xFF86B0FF), Color(0xFF408CE2)),
+                            start = Offset.Zero,
+                            end = Offset.Infinite
+                        )
+                    )
             ) {
-                Text(
-                    text = profileViewModel.merchant.value?.merchantName ?: "",
-                    style = TextStyle(
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 24.sp,
-                    ),
+                Column(
                     modifier = Modifier
-                        .padding(bottom = 4.dp)
-                )
-                Text(
-                    text = profileViewModel.merchant.value?.email ?: "",
-                    style = TextStyle(
-                        fontSize = 12.sp,
-                    ),
-                    modifier = Modifier
-                )
-                Text(
-                    text = profileViewModel.merchant.value?.merchantAddress ?: "",
-                    style = TextStyle(
-                        fontSize = 12.sp,
-                    ),
-                    modifier = Modifier
-                )
+                        .fillMaxSize(),
+                    verticalArrangement = Arrangement.Center
+
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .padding(16.dp),
+                    ) {
+                        Box(modifier = Modifier.size(110.dp)) {
+                            Image(
+                                painter = rememberImagePainter(
+                                    data = profileViewModel.merchant.value?.merchantLogo ?: ""
+                                ),
+                                contentDescription = "avatar",
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier
+                                    .size(100.dp)
+                                    .clip(CircleShape)
+                            )
+                            Box(
+                                modifier = Modifier
+                                    .size(48.dp)
+                                    .align(Alignment.BottomEnd)
+                                    .padding(8.dp)
+                                    .clip(CircleShape)
+                                    .background(BluePrimary)
+                                    .clickable {
+                                        launcher.launch(
+                                            PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                                        )
+                                    },
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.AddAPhoto,
+                                    contentDescription = "Change Photo",
+                                    tint = Color.White,
+                                    modifier = Modifier
+                                        .align(Alignment.Center)
+                                        .size(16.dp)
+                                )
+                            }
+                        }
+                        Column(
+                            modifier = Modifier
+                                .padding(start = 16.dp)
+                                .align(Alignment.CenterVertically)
+                        ) {
+                            Text(
+                                text = profileViewModel.merchant.value?.merchantName ?: "",
+                                style = TextStyle(
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 24.sp,
+                                    color = Color.White
+                                ),
+                                modifier = Modifier
+                                    .padding(bottom = 4.dp)
+                            )
+                            Text(
+                                text = profileViewModel.merchant.value?.email ?: "",
+                                style = TextStyle(
+                                    fontSize = 12.sp,
+                                    color = Color.White
+                                ),
+                                modifier = Modifier
+                            )
+                            Text(
+                                text = profileViewModel.merchant.value?.merchantAddress ?: "",
+                                style = TextStyle(
+                                    fontSize = 12.sp,
+                                    color = Color.White
+                                ),
+                                modifier = Modifier
+                            )
+                        }
+                    }
+                }
             }
         }
 
@@ -189,7 +218,7 @@ fun ProfileScreen(navController: NavController, profileViewModel: ProfileViewMod
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 16.dp, end = 16.dp, top = 8.dp)
+                .padding(start = 16.dp, end = 16.dp, top = 16.dp)
         ) {
             Column(
                 modifier = Modifier
@@ -229,7 +258,7 @@ fun ProfileScreen(navController: NavController, profileViewModel: ProfileViewMod
                               launchSingleTop = true
                           }
                     },
-                    shape = RoundedCornerShape(16.dp),
+                    shape = RoundedCornerShape(8.dp),
                     modifier = Modifier
                         .padding(bottom = 4.dp)
                         .height(55.dp)

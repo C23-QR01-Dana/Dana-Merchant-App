@@ -165,7 +165,11 @@ fun LoginScreen(loginViewModel: LoginViewModel = hiltViewModel()) {
                 Text(
                     text = "Register",
                     style = TextStyle(color= BluePrimary, textDecoration = TextDecoration.Underline),
-                    modifier = Modifier.clickable(onClick = {context.startActivity(Intent(context,RegisterActivity::class.java)) })
+                    modifier = Modifier.clickable(onClick = {
+                        val intent = Intent(context, RegisterActivity::class.java)
+                        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+                        context.startActivity(intent)
+                    })
 
                 )
             }
