@@ -31,6 +31,9 @@ import com.dana.merchantapp.presentation.screen.profile.ProfileScreen
 import com.dana.merchantapp.presentation.screen.qr.QrScreen
 import com.dana.merchantapp.presentation.screen.qr.scanqr.ScanCameraScreen
 import com.dana.merchantapp.presentation.screen.qr.scanqr.ScanResultScreen
+import com.dana.merchantapp.presentation.screen.withdrawal.AddBankScreen
+import com.dana.merchantapp.presentation.screen.withdrawal.BankSelectScreen
+import com.dana.merchantapp.presentation.screen.withdrawal.WithdrawAmountScreen
 import com.dana.merchantapp.presentation.screen.withdrawal.WithdrawalScreen
 import com.dana.merchantapp.presentation.ui.component.navigation.BottomNavItem
 import com.dana.merchantapp.presentation.ui.component.navigation.CustomBottomNavigation
@@ -65,12 +68,12 @@ fun Main(navController: NavHostController = rememberNavController()) {
 
     Scaffold(
         bottomBar = {
-            if (currentRoute != Screen.QR.route && currentRoute != Screen.ScanCamera.route && currentRoute != Screen.ScanResult.route) {
+            if (currentRoute == Screen.Home.route || currentRoute == Screen.History.route || currentRoute == Screen.Withdrawal.route || currentRoute == Screen.Profile.route ) {
                 CustomBottomNavigation(navController)
             }
         },
         floatingActionButton = {
-            if (currentRoute != Screen.QR.route && currentRoute != Screen.ScanCamera.route && currentRoute != Screen.ScanResult.route) {
+            if (currentRoute == Screen.Home.route || currentRoute == Screen.History.route || currentRoute == Screen.Withdrawal.route || currentRoute == Screen.Profile.route ) {
                 FloatingActionButton(
                     onClick = {
                         val item = BottomNavItem("QR", Icons.Default.QrCode, Screen.QR)
@@ -125,19 +128,31 @@ fun Main(navController: NavHostController = rememberNavController()) {
                     userId = id
                 )
             }
-
-
-
-
             composable(Screen.Withdrawal.route) {
-                WithdrawalScreen()
+                WithdrawalScreen(navController)
             }
             composable(Screen.History.route) {
                 HistoryScreen()
             }
-
             composable(Screen.Profile.route) {
                 ProfileScreen(navController)
+            }
+            composable(Screen.BankSelect.route) {
+                BankSelectScreen(navController)
+            }
+            composable(Screen.AddBank.route) {
+                AddBankScreen(navController)
+            }
+            composable(
+                route = Screen.WithdrawAmount.route,
+                arguments = listOf(
+                    navArgument("bankAccountNo") { type = NavType.StringType },
+                    navArgument("bankInst") { type = NavType.StringType },
+                )
+            ) {
+                val bankAccountNo = it.arguments?.getString("bankAccountNo") ?: ""
+                val bankInst = it.arguments?.getString("bankInst") ?: ""
+                WithdrawAmountScreen(navController, bankAccountNo, bankInst)
             }
         }
         // Content area
