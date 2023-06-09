@@ -1,8 +1,7 @@
 package com.dana.merchantapp.presentation.main
 
-import android.content.Intent
+
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,8 +13,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -23,8 +20,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.dana.merchantapp.presentation.screen.*
-import com.dana.merchantapp.presentation.landing.LandingActivity
 import com.dana.merchantapp.presentation.screen.history.HistoryScreen
 import com.dana.merchantapp.presentation.screen.home.HomeScreen
 import com.dana.merchantapp.presentation.screen.profile.ProfileScreen
@@ -77,7 +72,7 @@ fun Main(navController: NavHostController = rememberNavController()) {
                 FloatingActionButton(
                     onClick = {
                         val item = BottomNavItem("QR", Icons.Default.QrCode, Screen.QR)
-                        navController.navigate(item.screen.route)
+                        navController.navigate(Screen.QR.createRoute(0))
                     },
                     backgroundColor = BlueButton
 
@@ -96,10 +91,20 @@ fun Main(navController: NavHostController = rememberNavController()) {
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(Screen.Home.route) {
-                HomeScreen()
+                HomeScreen(navController)
             }
-            composable(Screen.QR.route) {
-                QrScreen(navController)
+
+            composable(
+                route = Screen.QR.route,
+                arguments = listOf(
+                    navArgument("tabIndex") { type = NavType.IntType }
+                )
+            ) {
+                val id = it.arguments?.getInt("tabIndex") ?: 0
+                QrScreen(
+                    navController = navController,
+                    initialTabIndex = id,
+                )
             }
             composable(
                 route = Screen.ScanCamera.route,

@@ -21,13 +21,17 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.dana.merchantapp.R
+import com.dana.merchantapp.presentation.login.LoginActivity
 
 import com.dana.merchantapp.presentation.main.MainActivity
 import com.dana.merchantapp.presentation.ui.component.CustomTextField
@@ -148,6 +152,9 @@ fun RegisterScreen(registerViewModel: RegisterViewModel = hiltViewModel()) {
                     .padding(bottom = 12.dp),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
             )
+
+
+
             Button(
                 onClick = {
                 registerViewModel.registerUser(name,address, email, password)
@@ -160,6 +167,19 @@ fun RegisterScreen(registerViewModel: RegisterViewModel = hiltViewModel()) {
                     .shadow(8.dp, shape = RoundedCornerShape(20.dp))
             ) {
                 Text(text = "Register")
+            }
+            Row(){
+                Text(
+                    text = "Already have an account? ",
+                    style = TextStyle(color= BluePrimary)
+                )
+
+                Text(
+                    text = "Login",
+                    style = TextStyle(color= BluePrimary, textDecoration = TextDecoration.Underline),
+                    modifier = Modifier.clickable(onClick = {context.startActivity(Intent(context,LoginActivity::class.java)) })
+
+                )
             }
         }
     }

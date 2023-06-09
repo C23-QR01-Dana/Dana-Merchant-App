@@ -5,7 +5,11 @@ sealed class Screen(val route: String) {
     object History : Screen("history")
     object Withdrawal : Screen("withdrawal")
     object Profile : Screen("profile")
-    object QR : Screen("qr")
+    object QR : Screen("qr/{tabIndex}"){
+        fun createRoute(tabIndex: Int): String {
+            return "qr/$tabIndex"
+        }
+    }
     object ScanCamera : Screen("scanCamera/{harga}") {
         fun createRoute(harga: String) = "scanCamera/$harga"
     }
