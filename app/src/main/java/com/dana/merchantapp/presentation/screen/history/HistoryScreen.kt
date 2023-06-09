@@ -26,11 +26,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.OffsetMapping
-import androidx.compose.ui.text.input.TransformedText
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.core.text.isDigitsOnly
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.dana.merchantapp.data.model.MerchantWithdrawTransaction
@@ -200,6 +196,7 @@ fun TransactionHistory(transactions: List<Transaction>?, historyViewModel: Histo
                         )
                     }
                     Button(
+                        shape = RoundedCornerShape(8.dp),
                         onClick = {
                             // Apply filters
                             scope.launch {
@@ -228,6 +225,7 @@ fun TransactionHistory(transactions: List<Transaction>?, historyViewModel: Histo
                         Text("APPLY")
                     }
                     Button(
+                        shape = RoundedCornerShape(8.dp),
                         onClick = {
                             // Reset filters
                             scope.launch {
@@ -248,10 +246,10 @@ fun TransactionHistory(transactions: List<Transaction>?, historyViewModel: Histo
                             .fillMaxWidth()
                             ,
                         colors = ButtonDefaults.buttonColors(
-                            backgroundColor = Color(0xFFE53935),
+                            backgroundColor = Color(0xFFFFFFFF),
                         )
                     ) {
-                        Text(text = "RESET FILTER", color = Color(0xFFFFFFFF))
+                        Text(text = "RESET FILTER", color = BluePrimary)
                     }
                     Box(Modifier.padding(bottom = 10.dp))
                 }
@@ -455,41 +453,4 @@ fun TransactionItem(transaction: Transaction, historyViewModel: HistoryViewModel
 //        return amountFormatter.format(number)
 //    }
 //}
-
-class ThousandSeparatorTransformation : VisualTransformation {
-    override fun filter(text: AnnotatedString): TransformedText {
-        val formatted = formatNumber(text.text)
-        val offsetTranslator = object : OffsetMapping {
-            override fun originalToTransformed(offset: Int): Int {
-                var transformedOffset = 0
-                var originalOffset = 0
-
-                formatted.forEach { char ->
-                    if (originalOffset == offset) return transformedOffset
-                    if (char != ',') originalOffset++
-                    transformedOffset++
-                }
-                return transformedOffset
-            }
-            override fun transformedToOriginal(offset: Int): Int {
-                var transformedOffset = 0
-                var originalOffset = 0
-
-                formatted.forEach { char ->
-                    if (transformedOffset == offset) return originalOffset
-                    if (char != ',') originalOffset++
-                    transformedOffset++
-                }
-                return originalOffset
-            }
-        }
-        return TransformedText(AnnotatedString(formatted), offsetTranslator)
-    }
-
-    private fun formatNumber(input: String): String {
-        val number = input.toLongOrNull() ?: return input
-        val amountFormatter = java.text.NumberFormat.getNumberInstance(Locale.US)
-        return amountFormatter.format(number)
-    }
-}
 
