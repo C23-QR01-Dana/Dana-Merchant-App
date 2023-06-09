@@ -1,7 +1,11 @@
 package com.dana.merchantapp.presentation.main
 
-
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Intent
+import android.os.Build
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,6 +17,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -20,6 +26,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.dana.merchantapp.presentation.screen.*
+import com.dana.merchantapp.presentation.landing.LandingActivity
 import com.dana.merchantapp.presentation.screen.history.HistoryScreen
 import com.dana.merchantapp.presentation.screen.home.HomeScreen
 import com.dana.merchantapp.presentation.screen.profile.ProfileScreen
@@ -41,6 +49,7 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        createNotificationChannel()
 
         setContent {
             MerchantAppTheme {
@@ -52,6 +61,28 @@ class MainActivity : ComponentActivity() {
                     Main()
                 }
             }
+        }
+    }
+
+    private fun createNotificationChannel() {
+        // If the Android Version is greater than Oreo,
+        // then create the NotificationChannel
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val name = "PAYMENT"
+            val descriptionText = "Notification for incoming payment"
+
+            val channel = NotificationChannel(
+                "PAYMENT_1",
+                name,
+                NotificationManager.IMPORTANCE_DEFAULT
+            ).apply {
+                description = descriptionText
+            }
+
+            // Register the channel
+            val notificationManager: NotificationManager =
+                getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
         }
     }
 }

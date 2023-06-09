@@ -5,11 +5,13 @@ import com.dana.merchantapp.data.home.MerchantMapper
 import com.dana.merchantapp.data.model.Merchant
 import com.dana.merchantapp.domain.profile.ProfileRepository
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.storage.FirebaseStorage
 import javax.inject.Inject
 
-class ProfileRepositoryImpl @Inject constructor (private val auth: FirebaseAuth, private val firestore: FirebaseFirestore, private val storage: FirebaseStorage):
+class ProfileRepositoryImpl @Inject constructor (private val auth: FirebaseAuth, private val firestore: FirebaseFirestore, private val storage: FirebaseStorage, private val messaging: FirebaseMessaging):
     ProfileRepository {
 
     override fun getMerchant(callback: (Merchant?) -> Unit) {
@@ -62,7 +64,19 @@ class ProfileRepositoryImpl @Inject constructor (private val auth: FirebaseAuth,
     }
 
     override fun logoutUser(callback: (Boolean, String) -> Unit) {
-        auth.signOut()
-        callback(true, "Logout Success")
+        val merchantId = auth.currentUser?.uid
+        if (merchantId != null) {
+            val merchantDocRef = firestore.collection("merchant").document(merchantId)
+            merchantDocRef.update("tokenId", FieldValue.delete())
+                .addOnSuccessListener {
+                    auth.signOut()
+                    callback(true, "Logout Success")
+                }
+                .addOnFailureListener {
+                    callback(false, "Unable to remove token")
+                }
+        } else {
+            callback(false, "Merchant Not Found")
+        }
     }
 }
