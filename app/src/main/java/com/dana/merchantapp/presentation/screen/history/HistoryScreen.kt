@@ -27,13 +27,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.sp
 import androidx.core.text.isDigitsOnly
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.dana.merchantapp.data.model.MerchantWithdrawTransaction
 import com.dana.merchantapp.data.model.PaymentTransaction
 import com.dana.merchantapp.data.model.Transaction
+import com.dana.merchantapp.presentation.ui.component.navigation.Screen
 import com.dana.merchantapp.presentation.ui.theme.BluePrimary
 import kotlinx.coroutines.launch
 import java.util.*
@@ -258,25 +262,43 @@ fun TransactionHistory(navController: NavController, transactions: List<Transact
             },
             content = {
                 Column {
-                    TopAppBar(
-                        backgroundColor = BluePrimary,
-                        title = {
-                            Text(
-                                text = "Transaction History",
-                                style = MaterialTheme.typography.h6,
-                                fontWeight = FontWeight.Bold
-                            )
-                        },
-                        modifier = Modifier
-                            .background(
-                                brush = Brush.linearGradient(
-                                    colors = listOf(Color(0xFF86B0FF), Color(0xFF408CE2)),
-                                    start = Offset.Zero,
-                                    end = Offset.Infinite
-                                )
-                            ),
-                        actions = {
-                            IconButton(onClick = { scope.launch { sheetState.show() } }) {
+//                    TopAppBar(
+//                        backgroundColor = BluePrimary,
+//                        title = {
+//                            Text(
+//                                text = "Transaction History" + historyViewModel.recentIncome.value + " " + historyViewModel.recentOutcome.value,
+//                                style = MaterialTheme.typography.h6,
+//                                fontWeight = FontWeight.Bold
+//                            )
+//                        },
+//                        modifier = Modifier
+//                            .background(
+//                                brush = Brush.linearGradient(
+//                                    colors = listOf(Color(0xFF86B0FF), Color(0xFF408CE2)),
+//                                    start = Offset.Zero,
+//                                    end = Offset.Infinite
+//                                )
+//                            ),
+//                        actions = {
+//                            IconButton(onClick = { scope.launch { sheetState.show() } }) {
+//                                Icon(Icons.Filled.FilterList, contentDescription = "Filter")
+//                                if (isFilterApplied.value) {
+//                                    Box(
+//                                        Modifier
+//                                            .padding(start = 20.dp, bottom = 20.dp)
+//                                            .size(12.dp)
+//                                            .background(Color(0xFFE53935), RoundedCornerShape(50))
+//                                    )
+//                                }
+//                            }
+//                        }
+//                    )
+                    Scaffold(
+                        floatingActionButton = {
+                            FloatingActionButton(
+                                onClick = { scope.launch { sheetState.show() } },
+                                backgroundColor = BluePrimary
+                            ) {
                                 Icon(Icons.Filled.FilterList, contentDescription = "Filter")
                                 if (isFilterApplied.value) {
                                     Box(
@@ -287,36 +309,103 @@ fun TransactionHistory(navController: NavController, transactions: List<Transact
                                     )
                                 }
                             }
-                        }
-                    )
+                        },
+                        floatingActionButtonPosition = FabPosition.End
+                    ) { contentPadding ->
+                        // Screen content without TopAppBar
+                        Column(
+                            Modifier
+                                .padding(contentPadding)
+                                .padding(bottom = contentPadding.calculateBottomPadding() + 16.dp)
+                        ) {
+                            // Your content here
+                            Card(
+                                shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(180.dp)
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .background(
+                                            brush = Brush.linearGradient(
+                                                colors = listOf(Color(0xFF86B0FF), Color(0xFF408CE2)),
+                                                start = Offset.Zero,
+                                                end = Offset.Infinite
+                                            )
+                                        )
+                                ) {
+                                    Column(
+                                        modifier = Modifier
+                                            .padding(vertical = 16.dp, horizontal = 24.dp)
+                                            .fillMaxWidth(),
+                                        horizontalAlignment = Alignment.CenterHorizontally,
 
-                    Box(Modifier.pullRefresh(state)) {
-                        LazyColumn {
-                            transactionsByDate?.forEach { (month, transactionsForMonth) ->
-                                item {
-                                    Text(
-                                        text = month,
-                                        modifier = Modifier.padding(16.dp),
-                                        style = MaterialTheme.typography.h6
-                                    )
-                                }
-                                items(transactionsForMonth.size) { index ->
-                                    val transaction = transactionsForMonth[index]
-                                    TransactionItem(
-                                        navController = navController,
-                                        transaction = transaction
-                                    )
-                                }
-                                item {
-                                    Divider(
-                                        modifier = Modifier.padding(horizontal = 16.dp),
-                                        color = Color.LightGray
-                                    )
+
+                                        ) {
+                                        Text(
+                                            text = "Transaction History",
+                                            style = TextStyle(
+                                                fontSize = 25.sp,
+                                                textAlign = TextAlign.Center,
+                                                color = Color.White
+                                            ),
+                                        )
+                                        Text(
+                                            text = "Income: Rp.${historyViewModel.recentIncome.value}",
+                                            style = TextStyle(
+                                                fontWeight = FontWeight.Normal,
+                                                fontSize = 16.sp,
+                                                textAlign = TextAlign.Left,
+                                                color = Color.White
+                                            ),
+                                            modifier = Modifier.padding(vertical = 8.dp)
+                                        )
+                                        Text(
+                                            text = "Outcome: Rp.${historyViewModel.recentOutcome.value}",
+                                            style = TextStyle(
+                                                fontWeight = FontWeight.Normal,
+                                                fontSize = 16.sp,
+                                                textAlign = TextAlign.Left,
+                                                color = Color.White
+                                            ),
+                                            modifier = Modifier.padding(vertical = 2.dp)
+                                        )
+                                    }
                                 }
                             }
+
+                            Box(Modifier.pullRefresh(state)) {
+                                LazyColumn {
+                                    transactionsByDate?.forEach { (month, transactionsForMonth) ->
+                                        item {
+                                            Text(
+                                                text = month,
+                                                modifier = Modifier.padding(16.dp),
+                                                style = MaterialTheme.typography.h6
+                                            )
+                                        }
+                                        items(transactionsForMonth.size) { index ->
+                                            val transaction = transactionsForMonth[index]
+                                            TransactionItem(
+                                                navController = navController,
+                                                transaction = transaction
+                                            )
+                                        }
+                                        item {
+                                            Divider(
+                                                modifier = Modifier.padding(horizontal = 16.dp),
+                                                color = Color.LightGray
+                                            )
+                                        }
+                                    }
+                                }
+                                PullRefreshIndicator(refreshing, state, Modifier.align(Alignment.TopCenter))
+                            }
                         }
-                        PullRefreshIndicator(refreshing, state, Modifier.align(Alignment.TopCenter))
                     }
+
+
                 }
             }
         )
@@ -331,7 +420,10 @@ fun TransactionItem(
 ) {
     val transaction = transaction
     var transactionAmount = "0"
-    val transactionId = transaction.id ?: "0"
+    var transactionId = transaction.id ?: "0"
+    if (transactionId == "") {
+        transactionId = "Not available"
+    }
     val merchantId = transaction.merchantId ?: "0"
     val transactionDate = transaction.timestamp?.let { historyViewModel.convertTimestampToDayMonthYear(it) } ?: "N/A"
     val transactionTime = transaction.timestamp?.let { historyViewModel.convertTimestampToHourMinute(it) } ?: "N/A"
@@ -369,7 +461,7 @@ fun TransactionItem(
             .fillMaxWidth()
             .clickable {
                 navController.navigate(
-                    "transactionItemDetails/${transactionTitle}/${transactionAmount}/${transactionId}/${merchantId}/${transactionDate + " • " + transactionTime}/${transactionType}/${transactionPartyId}"
+                    "transactionItemDetails/${transactionTitle}/${transactionAmount}/${transactionId}/${merchantId}/${"$transactionDate • $transactionTime"}/${transactionType}/${transactionPartyId}"
                 )
             },
         verticalAlignment = Alignment.CenterVertically

@@ -5,24 +5,29 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dana.merchantapp.data.model.Transaction
-import com.dana.merchantapp.domain.history.ApplyFilters
-import com.dana.merchantapp.domain.history.ConvertTimestampToDayMonthYear
-import com.dana.merchantapp.domain.history.ConvertTimestampToHourMinute
-import com.dana.merchantapp.domain.history.GetTransactions
+import com.dana.merchantapp.domain.history.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
 class HistoryViewModel @Inject constructor (
     private val getTransactions: GetTransactions,
     private val applyFilters: ApplyFilters,
+    private val getIncomeOutcome: GetIncomeOutcome,
     private val convertTimestampToHourMinute: ConvertTimestampToHourMinute,
     private val convertTimestampToDayMonthYear: ConvertTimestampToDayMonthYear)
     : ViewModel() {
 
     private val _transactions = mutableStateOf<List<Transaction>?>(null)
     val transactions: State<List<Transaction>?> get() = _transactions
+
+    private val _recentIncome = mutableStateOf<String?>("0")
+    val recentIncome: State<String?> get() = _recentIncome
+
+    private val _recentOutcome = mutableStateOf<String?>("0")
+    val recentOutcome: State<String?> get() = _recentOutcome
 
     var minAmount = mutableStateOf(0L)
     var maxAmount = mutableStateOf(Long.MAX_VALUE)
@@ -34,47 +39,23 @@ class HistoryViewModel @Inject constructor (
         viewModelScope.launch {
             getTransactions.getTransactions { transactions ->
                 if (transactions != null) {
-                    _transactions.value = applyFilters.applyFilters(transactions, minAmount.value, maxAmount.value, startDate.value, endDate.value, transactionType.value)
+                    val calendar = Calendar.getInstance()
+                    calendar.add(Calendar.DAY_OF_YEAR, -30)
+                    val timestamp30DaysAgo = calendar.timeInMillis
+
+                    val recentTransactions = applyFilters.applyFilters(transactions, 0L, Long.MAX_VALUE, timestamp30DaysAgo, Long.MAX_VALUE, "All")
+                    val hashMapIncomeOutcome = getIncomeOutcome.getIncomeOutcome(recentTransactions)
+                    _recentIncome.value = hashMapIncomeOutcome["income"] ?: "0"
+                    _recentOutcome.value = hashMapIncomeOutcome["outcome"] ?: "0"
+
+                    val filteredTransactions = applyFilters.applyFilters(transactions, minAmount.value, maxAmount.value, startDate.value, endDate.value, transactionType.value)
+                    _transactions.value = filteredTransactions
                 } else {
                     _transactions.value = null
                 }
             }
         }
     }
-
-//    fun applyFilters(fetchedTransactions: List<Transaction>) {
-//        val filteredTransactions = fetchedTransactions.filter { transaction ->
-//            val amount = transaction.amount ?: 0
-//            val timestamp = transaction.timestamp
-//            val type = transaction.trxType // Assuming you have a 'type' property in your Transaction model
-//
-//            val isAmountInRange = amount >= minAmount.value && amount <= maxAmount.value
-//
-//            // Check if timestamp is in seconds or milliseconds and convert to milliseconds if needed
-//            val timestampMillis = if (timestamp != null && timestamp.toString().length == 10) {
-//                timestamp * 1000
-//            } else {
-//                timestamp
-//            }
-//
-//            val isTimestampInRange = if (startDate.value != 0L && endDate.value != Long.MAX_VALUE) {
-//                timestampMillis != null && timestampMillis >= startDate.value && timestampMillis <= endDate.value
-//            } else {
-//                true
-//            }
-//
-//            val isTypeMatched = when (transactionType.value) {
-//                "Incoming" -> type == "PAYMENT"
-//                "Outgoing" -> type == "MERCHANT_WITHDRAW"
-//                else -> true
-//            }
-//
-//            isAmountInRange && isTimestampInRange && isTypeMatched
-//        }
-//        _transactions.value = filteredTransactions
-//    }
-
-
 
     fun convertTimestampToHourMinute(timestamp: Long): String {
         return convertTimestampToHourMinute.convertTimestampToHourMinute(timestamp)
