@@ -66,7 +66,7 @@ fun ScanQrScreen(navController: NavController) {
                 navController.navigate(Screen.ScanCamera.createRoute(harga))
             }
         },
-        shape = RoundedCornerShape(20.dp),
+        shape = RoundedCornerShape(8.dp),
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
