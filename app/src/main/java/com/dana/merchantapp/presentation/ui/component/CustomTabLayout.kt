@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dana.merchantapp.presentation.ui.theme.BlueButton
+import com.dana.merchantapp.presentation.ui.theme.BluePrimary
 
 @Composable
 fun CustomTabLayout(
@@ -40,7 +41,7 @@ fun CustomTabLayout(
                     onClick = { onTabSelected(index) },
                     modifier = Modifier
                         .background(
-                            if (selectedTabIndex == index) BlueButton else Color.Transparent
+                            if (selectedTabIndex == index) BluePrimary else Color.Transparent
                         )
                         .padding(vertical = 20.dp)
                 ) {

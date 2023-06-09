@@ -75,7 +75,7 @@ fun SplashScreen(
     val isLogin by splashViewModel.isLogin.observeAsState(false)
 
     LaunchedEffect(key1 = isLogin) {
-        delay(1500)
+        delay(500)
         if (isLogin) {
             navigateToMain()
         } else {
